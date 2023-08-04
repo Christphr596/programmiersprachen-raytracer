@@ -5,7 +5,10 @@
 #include "Color.hpp"
 
 struct Light {
-	float intensity = 1.0f;
-	Color color = { 0.0f, 1.0f, 0.0f };
+	std::string name = "";
 	glm::vec3 position = glm::vec3{ 0.0f, 0.0f, 0.0f };
+	Color color = { 0.0f, 0.0f, 0.0f };
+	float brightness = 1.0f;
+	
+	
 };
