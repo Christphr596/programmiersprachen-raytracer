@@ -69,8 +69,9 @@ Scene parse_sdf(std::string const& sdf_path) {
 
 			//parse geometric objects
 			if (token == "shape") {
-				string_stream >> token;
+				
 				float value = 0.0f;
+				string_stream >> token;
 
 				if (token == "box") {
 					std::string name;
@@ -110,8 +111,8 @@ Scene parse_sdf(std::string const& sdf_path) {
 						vec[i] = value;
 					}
 
-					float value = 0.0f;
-					string_stream >> value;
+					float radius = 0.0f;
+					string_stream >> radius;
 
 					std::string name_mat;
 					string_stream >> name_mat;
@@ -119,7 +120,7 @@ Scene parse_sdf(std::string const& sdf_path) {
 					auto it = scene.material_container.find(name_mat);
 					std::shared_ptr<Material> mat = scene.material_container[name_mat];
 
-					Sphere sphere{ name,  glm::vec3{vec[0], vec[1], vec[2]}, value, mat };
+					Sphere sphere{ name,  glm::vec3{vec[0], vec[1], vec[2]}, radius, mat };
 					scene.shape_container.push_back(std::make_shared<Sphere>(sphere));
 				}
 
