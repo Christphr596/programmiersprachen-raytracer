@@ -11,12 +11,12 @@
 #include <iostream>
 #include "scene.hpp"
 
-
+/*
 TEST_CASE("intersect_ray_sphere", "[intersect]") {
 	Light light{ "", glm::vec3{0,0,0}, Color{0.0, 0.0, 0.0}, 1 };
 
 }
-/*
+
 TEST_CASE("intersect_ray_sphere", "[intersect]") {
 	// Ray
 	glm::vec3 ray_origin{ 0.0f, 0.0f, 0.0f };
@@ -151,18 +151,6 @@ TEST_CASE("destruktor", "[virtual]") {
 	delete s2;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 TEST_CASE("volume_box") {
 	Color red{ 255,0,0 };
 	glm::vec3 position{ 0.0f,0.0f,0.0f };
@@ -179,12 +167,17 @@ TEST_CASE("volume_box") {
 TEST_CASE(" parse sdf file to scene object", "[parse_sdf]") {
 
 	Scene scene{};
-	Scene s = parse_sdf("C:\\Users\\Annika\\00UNI\\SE1\\06Aufgabe\\programmiersprachen-raytracer\\scene_1.sdf");
+	//Scene s = parse_sdf("C:\\Users\\Annika\\00UNI\\SE1\\06Aufgabe\\programmiersprachen-raytracer\\scene_1.sdf");
+	Scene s = parse_sdf("C:\\Users\\Hauptnutzer\\Uni\\Programmierung\\test_parser.sdf");
 
-	for (auto i : s.material_container) {
-		std::cout << i->name << "\n";
-	}
+	for (auto i : s.light_container) {
 
+		std::cout << i->name << "/n";
+	};
+
+	REQUIRE(s.light_container.empty() == false);
+
+	REQUIRE(s.shape_container.empty() == false);
 }
 
 
@@ -248,7 +241,6 @@ TEST_CASE("test_intersect", "[intersect]") {
 	REQUIRE(g1_x.direction == glm::vec3{ 1,0,0 });
 	REQUIRE(g1_x.name == std::string{ "green1" });
 	REQUIRE(g1_x.point == glm::vec3{ 4,0,0 });
-
 
 }
 
