@@ -4,12 +4,18 @@
 #include <glm/vec3.hpp>
 #include <Box.hpp>
 #include <shape.hpp>
+#include <light.hpp>
 //#include <sphere.hpp>
 //#include <glm/glm.hpp>
 //#include <glm/gtx/intersect.hpp>
 #include <iostream>
 #include "scene.hpp"
 
+
+TEST_CASE("intersect_ray_sphere", "[intersect]") {
+	Light light{ "", glm::vec3{0,0,0}, Color{0.0, 0.0, 0.0}, 1 };
+
+}
 /*
 TEST_CASE("intersect_ray_sphere", "[intersect]") {
 	// Ray

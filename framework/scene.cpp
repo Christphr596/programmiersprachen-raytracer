@@ -3,6 +3,8 @@
 #include <fstream>
 #include <sstream>
 #include <array>
+#include <vector>
+
 
 #include "scene.hpp"
 
@@ -26,9 +28,10 @@ Scene parse_sdf(std::string const& sdf_path) {
 		std::string token;
 
 		string_stream >> token;
-
 		if (token == "define") {
 			string_stream >> token;
+
+			//parse material
 			if (token == "material") {
 				std::string name;
 				string_stream >> name;
@@ -58,11 +61,107 @@ Scene parse_sdf(std::string const& sdf_path) {
 				float m = 0.0f;
 				string_stream >> m;
 
+
 				Material mat{ name, Color{ka[0], ka[1], ka[2]}, Color{kd[0], kd[1], kd[2]}, Color{ks[0], ks[1], ks[2]}, m };
 
-				scene.material_container.push_back(std::make_shared<Material>(mat));
+				scene.material_container.insert(std::make_pair(name, std::make_shared<Material>(mat)));
+			}
+
+			//parse geometric objects
+			if (token == "shape") {
+				string_stream >> token;
+				float value = 0.0f;
+
+				if (token == "box") {
+					std::string name;
+					string_stream >> name;
+
+					std::array<float, 3> vec1{};
+					for (int i = 0; i < vec1.size(); ++i) {
+						string_stream >> value;
+						vec1[i] = value;
+					}
+
+					std::array<float, 3> vec2{};
+					for (int i = 0; i < vec2.size(); ++i) {
+						string_stream >> value;
+						vec2[i] = value;
+					}
+
+					std::string name_mat;
+					string_stream >> name_mat;
+
+					auto it = scene.material_container.find(name_mat);
+					std::shared_ptr<Material> mat = scene.material_container[name_mat];
+
+					Box box{ name, glm::vec3{vec1[0], vec1[1], vec1[2]},  glm::vec3{vec2[0], vec2[1], vec2[2]}, mat };
+					scene.shape_container.push_back(std::make_shared<Box>(box));
+
+				}
+				if (token == "sphere") {
+					//Sphere r1{ std::string {"red1"}, glm::vec3 {0.0f,8.0f,0.0f}, float {4.0f}, Color {255,0,0} };
+
+					std::string name;
+					string_stream >> name;
+
+					std::array<float, 3> vec{};
+					for (int i = 0; i < vec.size(); ++i) {
+						string_stream >> value;
+						vec[i] = value;
+					}
+
+					float value = 0.0f;
+					string_stream >> value;
+
+					std::string name_mat;
+					string_stream >> name_mat;
+
+					auto it = scene.material_container.find(name_mat);
+					std::shared_ptr<Material> mat = scene.material_container[name_mat];
+
+					Sphere sphere{ name,  glm::vec3{vec[0], vec[1], vec[2]}, value, mat };
+					scene.shape_container.push_back(std::make_shared<Sphere>(sphere));
+				}
 
 			}
+
+			//parse light
+			if (token == "light") {
+				std::string name;
+				string_stream >> name;
+
+				float value = 0.0f;
+
+				std::array<float, 3> position{};
+				for (int i = 0; i < position.size(); ++i) {
+					string_stream >> value;
+					position[i] = value;
+				}
+
+				std::array<float, 3> color{};
+				for (int i = 0; i < position.size(); ++i) {
+					string_stream >> value;
+					color[i] = value;
+				}
+
+				float brightness = 0.0f;
+				string_stream >> brightness;
+
+				Light light{ name, glm::vec3{position[0], position[1], position[2]}, Color{color[0], color[1], color[2]}, brightness };
+				scene.light_container.push_back(std::make_shared<Light>(light));
+			}
+
+			if (token == "camera") {
+				std::string name;
+				string_stream >> name;
+
+				float fov_x = 0.0f;
+				string_stream >> fov_x;
+
+				Camera camera{name, fov_x};
+				scene.camera_container.push_back(std::make_shared<Camera>(camera));
+			}
+			
 
 		}
 
