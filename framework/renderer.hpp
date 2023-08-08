@@ -15,6 +15,7 @@
 #include "ppmwriter.hpp"
 #include "Ray.hpp"
 #include "shape.hpp"
+#include "hitpoint.hpp"
 #include <string>
 #include <glm/glm.hpp>
 
@@ -26,7 +27,7 @@ public:
 
   void render();
   Color trace(Ray const& r);
-  Color shade(Ray const& r, Shape const& s);
+  Color shade(Ray const& r, Shape const& s, HitPoint const& h);
   void write(Pixel const& p);
 
   inline std::vector<Color> const& color_buffer() const

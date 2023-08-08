@@ -19,17 +19,20 @@ Renderer::Renderer(unsigned w, unsigned h, std::string const& file)
   , ppm_(width_, height_)
 {}
 
-Color Renderer::shade(Ray const& r, Shape const& s) {
+Color Renderer::shade(Ray const& r, Shape const& s, HitPoint const& h) {
+
     return Color{1.0f, 0.0f, 0.0f};
 
 }
 
 Color Renderer::trace(Ray const& r) {
 
-    Sphere s{ glm::vec3{0.0f, 0.0f, -600.0f}, 100.0f };
+    Sphere s{ glm::vec3{0.0f, 0.0f, -800.0f}, 100.0f };
 
-    if (s.intersect(r).cut) {
-        return shade(r, s);
+    HitPoint h = s.intersect(r);
+
+    if (h.cut) {
+        return shade(r, s, h);
     }
     else {
         return Color{ 1.0f, 1.0f, 1.0f };
