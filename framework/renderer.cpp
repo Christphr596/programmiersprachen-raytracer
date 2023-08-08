@@ -8,6 +8,8 @@
 // -----------------------------------------------------------------------------
 
 #include "renderer.hpp"
+#include "sphere.hpp"
+
 
 Renderer::Renderer(unsigned w, unsigned h, std::string const& file)
   : width_(w)
@@ -17,7 +19,43 @@ Renderer::Renderer(unsigned w, unsigned h, std::string const& file)
   , ppm_(width_, height_)
 {}
 
-void Renderer::render()
+Color Renderer::shade(Ray const& r, Shape const& s, HitPoint const& h) {
+
+    return Color{1.0f, 0.0f, 0.0f};
+
+}
+
+Color Renderer::trace(Ray const& r) {
+
+    Sphere s{ glm::vec3{0.0f, 0.0f, -800.0f}, 100.0f };
+
+    HitPoint h = s.intersect(r);
+
+    if (h.cut) {
+        return shade(r, s, h);
+    }
+    else {
+        return Color{ 1.0f, 1.0f, 1.0f };
+    }
+
+}
+
+void Renderer::render() {
+
+    for (unsigned y = 0; y < height_; ++y) {
+        for (unsigned x = 0; x < width_; ++x) {
+            Pixel p{ x,y };
+            Ray r{ glm::vec3{0.0f, 0.0f, 0.0f}, glm::normalize( glm::vec3{(-200.0f + float(x* 1.0f)), (-200.0f + float(y * 1.0f)), -400.0f})};
+            p.color = trace(r);
+
+            write(p);
+        }
+    }
+    ppm_.save(filename_);
+
+}
+
+/*void Renderer::render()
 {
   std::size_t const checker_pattern_size = 20;
 
@@ -34,7 +72,7 @@ void Renderer::render()
     }
   }
   ppm_.save(filename_);
-}
+}*/
 
 void Renderer::write(Pixel const& p)
 {
