@@ -16,18 +16,19 @@
 #include "Ray.hpp"
 #include "shape.hpp"
 #include "hitpoint.hpp"
+#include "scene.hpp"
 #include <string>
 #include <glm/glm.hpp>
 
 class Renderer
 {
 public:
-  Renderer(unsigned w, unsigned h, std::string const& file);
+    Renderer(unsigned w, unsigned h, std::string const& file, Scene const& scene);
 
 
   void render();
   Color trace(Ray const& r);
-  Color shade(Ray const& r, Shape const& s, HitPoint const& h);
+  Color shade(Ray const& r, std::shared_ptr<Shape> const& s, HitPoint const& h);
   void write(Pixel const& p);
 
   inline std::vector<Color> const& color_buffer() const
@@ -41,6 +42,7 @@ private:
   std::vector<Color> color_buffer_;
   std::string filename_;
   PpmWriter ppm_;
+  Scene scene_;
 };
 
 #endif // #ifndef BUW_RENDERER_HPP

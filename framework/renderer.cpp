@@ -11,33 +11,45 @@
 #include "sphere.hpp"
 
 
-Renderer::Renderer(unsigned w, unsigned h, std::string const& file)
+Renderer::Renderer(unsigned w, unsigned h, std::string const& file, Scene const& scene)
   : width_(w)
   , height_(h)
   , color_buffer_(w*h, Color{0.0, 0.0, 0.0})
   , filename_(file)
   , ppm_(width_, height_)
+  , scene_(scene)
 {}
 
-Color Renderer::shade(Ray const& r, Shape const& s, HitPoint const& h) {
+Color Renderer::shade(Ray const& r, std::shared_ptr<Shape> const& s, HitPoint const& h) {
 
-    return Color{1.0f, 0.0f, 0.0f};
+    return Color{ h.material->ka.r * 0.5f, h.material->ka.g * 0.5f, h.material->ka.b * 0.5f };
 
 }
 
 Color Renderer::trace(Ray const& r) {
 
-    Sphere s{ glm::vec3{0.0f, 0.0f, -800.0f}, 100.0f };
+    HitPoint closest_hp{};
+    std::shared_ptr<Shape> closest_s{};
 
-    HitPoint h = s.intersect(r);
+    for (auto s : scene_.shape_container) {
+        HitPoint hp = s->intersect(r);
+        if (hp.cut) {
+            if (hp.distance < closest_hp.distance) {
+                closest_hp = hp;
+                closest_s = s;
+            }
+        }
+        
+    }
 
-    if (h.cut) {
-        return shade(r, s, h);
+    if (closest_hp.cut) {
+        return shade(r, closest_s, closest_hp);
     }
     else {
-        return Color{ 1.0f, 1.0f, 1.0f };
+        return Color{ 0.5f, 0.5f, 0.5f };
     }
 
+    
 }
 
 void Renderer::render() {
