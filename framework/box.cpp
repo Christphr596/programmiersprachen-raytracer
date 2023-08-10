@@ -126,3 +126,27 @@ HitPoint Box::intersect(Ray const& r) {
 
 
 }
+
+glm::vec3 Box::normale(glm::vec3 const& point)
+{
+	if (point.x == min_.x) {
+		return glm::vec3{-1.0f, 0.0f, 0.0f};
+	}
+	else if (point.x == max_.x) {
+		return glm::vec3{ 1.0f, 0.0f, 0.0f };
+	}
+	else if (point.y == min_.y) {
+		return glm::vec3{ 0.0f, -1.0f, 0.0f };
+	}
+	else if (point.y == max_.y) {
+		return glm::vec3{ 0.0f, 1.0f, 0.0f };
+	}
+	else if (point.z == min_.z) {
+		return glm::vec3{ 0.0f, 0.0f, -1.0f };
+	}
+	else if (point.z == max_.z) {
+		return glm::vec3{ 0.0f, 0.0f, 1.0f };
+	}
+
+	return glm::vec3{0.0f, 0.0f, 0.0f};
+}

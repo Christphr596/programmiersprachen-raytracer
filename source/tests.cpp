@@ -10,6 +10,8 @@
 //#include <glm/gtx/intersect.hpp>
 #include <iostream>
 #include "scene.hpp"
+#include "box.hpp"
+#include "sphere.hpp"
 
 /*
 TEST_CASE("intersect_ray_sphere", "[intersect]") {
@@ -161,7 +163,7 @@ TEST_CASE("volume_box") {
 	s1->print(std::cout);
 	s2->print(std::cout);
 }
-*/
+
 
 
 TEST_CASE(" parse sdf file to scene object", "[parse_sdf]") {
@@ -243,7 +245,41 @@ TEST_CASE("test_intersect", "[intersect]") {
 	REQUIRE(g1_x.point == glm::vec3{ 4,0,0 });
 
 }
+*/
 
+TEST_CASE() {
+
+	Sphere s{ glm::vec3{0.0f, 0.0f, 0.0f}, 200.0f };
+
+	glm::vec3 n1 = s.normale(glm::vec3{0.0f, 0.0f, 200.0f});
+	REQUIRE(n1.x == Approx(0.0f));
+	REQUIRE(n1.y == Approx(0.0f));
+	REQUIRE(n1.z == Approx(1.0f));
+
+	glm::vec3 n2 = s.normale(glm::vec3{ -200.0f, 0.0f, 0.0f });
+	REQUIRE(n2.x == Approx(-1.0f));
+	REQUIRE(n2.y == Approx(0.0f));
+	REQUIRE(n2.z == Approx(0.0f));
+
+
+	Box b{ glm::vec3{100.0f, 0.0f, -100.0f}, glm::vec3{300.0f, 200.0f, -400.0f} };
+
+	glm::vec3 n3 = b.normale(glm::vec3{100.0f, 50.0f, -200.0f});
+	REQUIRE(n3.x == Approx(-1.0f));
+	REQUIRE(n3.y == Approx(0.0f));
+	REQUIRE(n3.z == Approx(0.0f));
+
+	glm::vec3 n4 = b.normale(glm::vec3{ 100.0f, 150.0f, -300.0f });
+	REQUIRE(n4.x == Approx(-1.0f));
+	REQUIRE(n4.y == Approx(0.0f));
+	REQUIRE(n4.z == Approx(0.0f));
+
+	glm::vec3 n5 = b.normale(glm::vec3{ 200.0f, 200.0f, -300.0f });
+	REQUIRE(n5.x == Approx(0.0f));
+	REQUIRE(n5.y == Approx(1.0f));
+	REQUIRE(n5.z == Approx(0.0f));
+
+}
 
 
 int main(int argc, char *argv[])
