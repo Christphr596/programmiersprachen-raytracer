@@ -104,7 +104,8 @@ void Renderer::render() {
         for (unsigned x = 0; x < width_; ++x) {
             Pixel p{ x,y };
             Ray r{ glm::vec3{0.0f, 0.0f, 0.0f}, glm::normalize( glm::vec3{(-200.0f + float(x* 1.0f)), (-200.0f + float(y * 1.0f)), -400.0f})};
-            p.color = trace(r);
+            Color c = trace(r);
+            p.color = Color{ c.r / (c.r + 1), c.g / (c.g + 1), c.b / (c.b + 1) };
 
             write(p);
         }
