@@ -7,6 +7,9 @@
 // Renderer
 // -----------------------------------------------------------------------------
 
+#include <map>
+#include <memory>
+#include <utility>
 #include "renderer.hpp"
 #include "sphere.hpp"
 
@@ -22,7 +25,50 @@ Renderer::Renderer(unsigned w, unsigned h, std::string const& file, Scene const&
 
 Color Renderer::shade(Ray const& r, std::shared_ptr<Shape> const& s, HitPoint const& h) {
 
-    return Color{ h.material->ka.r * 0.5f, h.material->ka.g * 0.5f, h.material->ka.b * 0.5f };
+    float red = 0.0f;
+    float green = 0.0f;
+    float blue = 0.0f;
+
+    red += h.material->ka.r * 0.5f;
+    green += h.material->ka.g * 0.5f;
+    blue += h.material->ka.b * 0.5f;
+
+    std::map<std::shared_ptr<Light>, glm::vec3> spotlights_vec{};
+
+    for (auto l : scene_.light_container) {
+        glm::vec3 light_vec = glm::normalize((l->position) - h.point);
+
+        bool visible = true;
+        for (auto i : scene_.shape_container) {
+            if (i->get_name() != s->get_name()) {
+                HitPoint barrier = i->intersect(Ray{ h.point, light_vec });
+
+                if (barrier.cut && barrier.distance < glm::distance(l->position, h.point) && barrier.distance > 0) {
+                    visible = false;
+                    break;
+                }
+
+            }
+            
+        }
+
+        if (visible) {
+            spotlights_vec.insert(std::make_pair(l, light_vec));
+        }
+    }
+
+    glm::vec3 normale = s->normale(h.point);
+
+    for (auto [l, l_vec] : spotlights_vec) {
+        float skalar_n_l_vec = glm::dot(normale, l_vec);
+        red += l->brightness * h.material->kd.r * skalar_n_l_vec;
+        green += l->brightness * h.material->kd.g * skalar_n_l_vec;
+        blue += l->brightness * h.material->kd.b * skalar_n_l_vec;
+    }
+
+    
+
+    return Color{red, green, blue};
 
 }
 
