@@ -5,6 +5,7 @@
 #include "material.hpp"
 #include <string>
 #include <utility>
+#include <cmath>
 
 #define OWN_PI 3.14159265359
 
@@ -129,24 +130,26 @@ HitPoint Box::intersect(Ray const& r) {
 
 glm::vec3 Box::normale(glm::vec3 const& point)
 {
-	if (point.x == min_.x) {
+	float eps = 0.1f;
+
+	if (std::abs(point.x - min_.x) < eps) {
 		return glm::vec3{-1.0f, 0.0f, 0.0f};
 	}
-	else if (point.x == max_.x) {
+	else if (std::abs(point.x - max_.x) < eps) {
 		return glm::vec3{ 1.0f, 0.0f, 0.0f };
 	}
-	else if (point.y == min_.y) {
+	else if (std::abs(point.y - min_.y) < eps) {
 		return glm::vec3{ 0.0f, -1.0f, 0.0f };
 	}
-	else if (point.y == max_.y) {
+	else if (std::abs(point.y - max_.y) < eps) {
 		return glm::vec3{ 0.0f, 1.0f, 0.0f };
 	}
-	else if (point.z == min_.z) {
+	else if (std::abs(point.z - min_.z) < eps) {
 		return glm::vec3{ 0.0f, 0.0f, -1.0f };
 	}
-	else if (point.z == max_.z) {
+	else if (std::abs(point.z - max_.z) < eps) {
 		return glm::vec3{ 0.0f, 0.0f, 1.0f };
 	}
 
-	return glm::vec3{0.0f, 0.0f, 0.0f};
+	//return glm::vec3{0.0f, 0.0f, 0.0f};
 }
