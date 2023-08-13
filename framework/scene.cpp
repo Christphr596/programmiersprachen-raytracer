@@ -100,7 +100,7 @@ Scene parse_sdf(std::string const& sdf_path) {
 
 				}
 				if (token == "sphere") {
-					//Sphere r1{ std::string {"red1"}, glm::vec3 {0.0f,8.0f,0.0f}, float {4.0f}, Color {255,0,0} };
+			
 
 					std::string name;
 					string_stream >> name;
@@ -124,8 +124,99 @@ Scene parse_sdf(std::string const& sdf_path) {
 					scene.shape_container.push_back(std::make_shared<Sphere>(sphere));
 				}
 
-			}
+				
+				
+				if (token == "cylinder") {
 
+					std::string name;
+					string_stream >> name;
+
+					std::array<float, 3> midpoint{};
+					for (int i = 0; i < midpoint.size(); ++i) {
+						string_stream >> value;
+						midpoint[i] = value;
+					}
+
+					float radius = 0.0f;
+					string_stream >> radius;
+
+					float height = 0.0f;
+					string_stream >> height;
+
+					std::string name_mat;
+					string_stream >> name_mat;
+
+					auto it = scene.material_container.find(name_mat);
+					std::shared_ptr<Material> mat = scene.material_container[name_mat];
+
+					Cylinder cylinder{ name,  glm::vec3{midpoint[0], midpoint[1], midpoint[2]}, radius, height, mat };
+					scene.shape_container.push_back(std::make_shared<Cylinder>(cylinder));
+				}
+				
+				if (token == "cone") {
+
+					std::string name;
+					string_stream >> name;
+
+					std::array<float, 3> vec{};
+					for (int i = 0; i < vec.size(); ++i) {
+						string_stream >> value;
+						vec[i] = value;
+					}
+
+					float radius = 0.0f;
+					string_stream >> radius;
+
+					float height = 0.0f;
+					string_stream >> height;
+
+					std::string name_mat;
+					string_stream >> name_mat;
+
+					auto it = scene.material_container.find(name_mat);
+					std::shared_ptr<Material> mat = scene.material_container[name_mat];
+
+					Cone cone{ name,  glm::vec3{vec[0], vec[1], vec[2]}, radius, height, mat };
+					scene.shape_container.push_back(std::make_shared<Cone>(cone));
+				}
+				
+				if (token == "triangle") {
+
+					std::string name;
+					string_stream >> name;
+
+					float value = 0.0f;
+
+					std::array<float, 3> first{};
+					for (int i = 0; i < first.size(); ++i) {
+						string_stream >> value;
+						first[i] = value;
+					}
+
+					std::array<float, 3> second{};
+					for (int i = 0; i < second.size(); ++i) {
+						string_stream >> value;
+						second[i] = value;
+					}
+
+					std::array<float, 3> third{};
+					for (int i = 0; i < third.size(); ++i) {
+						string_stream >> value;
+						third[i] = value;
+					}
+
+					std::string name_mat;
+					string_stream >> name_mat;
+
+					auto it = scene.material_container.find(name_mat);
+					std::shared_ptr<Material> mat = scene.material_container[name_mat];
+
+					Triangle triangle{ name, glm::vec3{first[0], first[1], first[2]}, glm::vec3{second[0], second[1], second[2]}, glm::vec3{third[0], third[1], third[2]}, mat };
+					scene.shape_container.push_back(std::make_shared<Triangle>(triangle));
+				}
+				
+			}
+			
 			//parse light
 			if (token == "light") {
 				std::string name;
@@ -159,7 +250,26 @@ Scene parse_sdf(std::string const& sdf_path) {
 				float fov_x = 0.0f;
 				string_stream >> fov_x;
 
-				Camera camera{name, fov_x};
+				float value = 0.0f;
+				std::array<float, 3> eye{};
+				for (int i = 0; i < eye.size(); ++i) {
+					string_stream >> value;
+					eye[i] = value;
+				}
+
+				std::array<float, 3> dir{};
+				for (int i = 0; i < dir.size(); ++i) {
+					string_stream >> value;
+					dir[i] = value;
+				}
+
+				std::array<float, 3> up{};
+				for (int i = 0; i < up.size(); ++i) {
+					string_stream >> value;
+					up[i] = value;
+				}
+
+				Camera camera{ name, fov_x, glm::vec3{eye[0], eye[1], eye[2]},  glm::vec3{dir[0], dir[1], dir[2]}, glm::vec3{up[0], up[1], up[2]}};
 				scene.camera_container.push_back(std::make_shared<Camera>(camera));
 			}
 			

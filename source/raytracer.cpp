@@ -1,3 +1,5 @@
+#pragma once
+
 #include <renderer.hpp>
 #include <window.hpp>
 
@@ -14,13 +16,13 @@ int main(int argc, char* argv[])
   unsigned const image_height = 401/*600*/;
   std::string const filename = "./checkerboard.ppm";
   
-  Scene s = parse_sdf("C:\\Users\\Annika\\00UNI\\SE1\\07Raytracer\\programmiersprachen-raytracer\\test_1.sdf");
+  Scene s = parse_sdf("C:\\Users\\Hauptnutzer\\Uni\\Programmierung\\test_parser1.sdf");
 
   for (auto i: s.shape_container) {
       std::cout << i->get_name();
   }
   
-  Renderer renderer{image_width, image_height, filename, parse_sdf("C:\\Users\\Annika\\00UNI\\SE1\\07Raytracer\\programmiersprachen-raytracer\\test_1.sdf")};
+  Renderer renderer{image_width, image_height, filename, parse_sdf("C:\\Users\\Hauptnutzer\\Uni\\Programmierung\\test_parser1.sdf")};
 
   renderer.render();
 

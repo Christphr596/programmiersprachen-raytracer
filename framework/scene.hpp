@@ -9,6 +9,9 @@
 #include "camera.hpp"
 #include "box.hpp"
 #include "sphere.hpp"
+#include "cone.hpp"
+#include "cylinder.hpp"
+#include "triangle.hpp"
 
 
 struct Scene {

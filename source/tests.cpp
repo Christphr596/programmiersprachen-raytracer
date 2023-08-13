@@ -161,7 +161,7 @@ TEST_CASE("volume_box") {
 	s1->print(std::cout);
 	s2->print(std::cout);
 }
-*/
+
 
 
 TEST_CASE(" parse sdf file to scene object", "[parse_sdf]") {
@@ -241,6 +241,79 @@ TEST_CASE("test_intersect", "[intersect]") {
 	REQUIRE(g1_x.direction == glm::vec3{ 1,0,0 });
 	REQUIRE(g1_x.name == std::string{ "green1" });
 	REQUIRE(g1_x.point == glm::vec3{ 4,0,0 });
+
+}
+*/
+
+TEST_CASE("test_intersect", "[intersect]") {
+
+	Material ma{ "material", Color{ 1.0f, 0.0f, 0.0f }, Color{ 0.0f, 1.0f, 0.0f }, Color{ 0.0f, 0.0f, 1.0f }, float{ 4.5f } };
+	std::shared_ptr<Material> mat = std::make_shared<Material>(ma);
+
+	Triangle x1{ "red1", glm::vec3 {1.0f,2.0f,-1.0f}, glm::vec3 {-1.0f,2.0f,-1.0f}, glm::vec3 {0.0f,2.0f,4.0f},	mat };
+	Triangle y1{ "yellow1", glm::vec3 {1.0f,0.0f,0.0f}, glm::vec3 {0.0f,0.0f,1.0f}, glm::vec3 {0.0f,1.0f,0.0f}, mat };
+	Triangle g1{ "green1", glm::vec3 {1.0f,-1.0f,2.0f}, glm::vec3 {-1.0f,-1.0f,2.0f}, glm::vec3 {0.0f,1.0f,2.0f}, mat };
+
+	Ray x{ glm::vec3{0,0,0} , glm::vec3{1,1,1} };
+	Ray y{ glm::vec3{0,0,0} , glm::vec3{0,1,0} };
+	Ray z{ glm::vec3{0,0,0} , glm::vec3{0,0,1} };
+	Ray mz{ glm::vec3{0,0,0} , glm::vec3{0,0,-1} };
+
+
+	HitPoint y1_x = y1.intersect(x); //true
+
+
+	HitPoint x1_mz = x1.intersect(mz); //false
+	HitPoint x1_x = x1.intersect(x); //false
+	HitPoint x1_y = x1.intersect(y); //true
+	HitPoint x1_z = x1.intersect(z); //false
+
+	//HitPoint y1_x = y1.intersect(x); //true
+	HitPoint y1_y = y1.intersect(y); //true
+	HitPoint y1_z = y1.intersect(z); //true
+	HitPoint y1_mz = y1.intersect(mz); //false
+
+	HitPoint g1_x = g1.intersect(x); //false
+	HitPoint g1_y = g1.intersect(y); //false
+	HitPoint g1_z = g1.intersect(z); //true
+	HitPoint g1_mz = g1.intersect(mz); //false
+/**/
+	REQUIRE(y1_x.cut == false); //f
+
+	REQUIRE(x1_z.cut == false); //k
+	REQUIRE(x1_y.cut == false); //f
+	REQUIRE(x1_mz.cut == false); //k
+	REQUIRE(x1_x.cut == false); //k
+	
+	REQUIRE(y1_z.cut == false); //f
+	REQUIRE(y1_mz.cut == false); //f
+	REQUIRE(y1_y.cut == true);
+	REQUIRE(g1_z.cut == true); //k
+	REQUIRE(g1_y.cut == false); //k
+	REQUIRE(g1_mz.cut == true); //f
+	REQUIRE(g1_x.cut == true);
+
+
+
+
+	REQUIRE(y1_x.cut == true);
+	REQUIRE(y1_x.material == mat);
+	REQUIRE(y1_x.direction == glm::vec3{ 1,1,1 });
+	REQUIRE(y1_x.name == std::string{ "yellow1" });
+
+	REQUIRE(x1_y.cut == true);
+	//REQUIRE(x1_y.distance == 2.0f);
+	REQUIRE(x1_y.material == mat);
+	//REQUIRE(x1_y.direction == glm::vec3{ 1,1,1 });
+	REQUIRE(x1_y.name == std::string{ "red1" });
+	REQUIRE(x1_z.point == glm::vec3{ 0,2,0 });
+	
+	REQUIRE(g1_z.cut == true);
+	REQUIRE(g1_z.distance == 2.0f);
+	REQUIRE(g1_z.material == mat);
+	REQUIRE(g1_z.direction == glm::vec3{ 0,0,1 });
+	REQUIRE(g1_z.name == std::string{ "green1" });
+	REQUIRE(g1_z.point == glm::vec3{ 0,0,2 });
 
 }
 
