@@ -10,6 +10,8 @@
 #include <map>
 #include <memory>
 #include <utility>
+#include <cmath>
+#include <algorithm>
 #include "renderer.hpp"
 #include "sphere.hpp"
 
@@ -60,10 +62,15 @@ Color Renderer::shade(Ray const& r, std::shared_ptr<Shape> const& s, HitPoint co
     glm::vec3 normale = s->normale(h.point);
 
     for (auto [l, l_vec] : spotlights_vec) {
-        float skalar_n_l_vec = glm::dot(normale, l_vec);
-        red += l->brightness * h.material->kd.r * skalar_n_l_vec;
-        green += l->brightness * h.material->kd.g * skalar_n_l_vec;
-        blue += l->brightness * h.material->kd.b * skalar_n_l_vec;
+        float skalar_n_l_vec = std::max( glm::dot(normale, l_vec), 0.0f);
+
+        glm::vec3 r = glm::normalize(2 * skalar_n_l_vec * normale - l_vec);
+        glm::vec3 v = glm::normalize(glm::vec3{ 0.0f, 0.0f, 0.0f } - h.point);
+        float skalar_r_v = glm::dot(r, v);
+
+        red += l->color.r * l->brightness * (h.material->kd.r * skalar_n_l_vec + h.material->ks.r * std::pow(skalar_r_v, h.material->m));
+        green += l->color.g * l->brightness * (h.material->kd.g * skalar_n_l_vec + h.material->ks.g * std::pow(skalar_r_v, h.material->m));
+        blue += l->color.b * l->brightness * (h.material->kd.b * skalar_n_l_vec + h.material->ks.b * std::pow(skalar_r_v, h.material->m));
     }
 
     
