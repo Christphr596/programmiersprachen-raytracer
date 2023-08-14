@@ -100,7 +100,6 @@ Scene parse_sdf(std::string const& sdf_path) {
 
 				}
 				if (token == "sphere") {
-					//Sphere r1{ std::string {"red1"}, glm::vec3 {0.0f,8.0f,0.0f}, float {4.0f}, Color {255,0,0} };
 
 					std::string name;
 					string_stream >> name;
@@ -159,7 +158,26 @@ Scene parse_sdf(std::string const& sdf_path) {
 				float fov_x = 0.0f;
 				string_stream >> fov_x;
 
-				Camera camera{name, fov_x};
+				float value = 0.0f;
+				std::array<float, 3> eye{};
+				for (int i = 0; i < eye.size(); ++i) {
+					string_stream >> value;
+					eye[i] = value;
+				}
+
+				std::array<float, 3> dir{};
+				for (int i = 0; i < dir.size(); ++i) {
+					string_stream >> value;
+					dir[i] = value;
+				}
+
+				std::array<float, 3> up{};
+				for (int i = 0; i < up.size(); ++i) {
+					string_stream >> value;
+					up[i] = value;
+				}
+
+				Camera camera{ name, fov_x, glm::vec3{eye[0], eye[1], eye[2]},  glm::vec3{dir[0], dir[1], dir[2]}, glm::vec3{up[0], up[1], up[2]} };
 				scene.camera_container.push_back(std::make_shared<Camera>(camera));
 			}
 			
