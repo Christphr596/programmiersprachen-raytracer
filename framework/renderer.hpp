@@ -25,7 +25,7 @@ class Renderer
 public:
     Renderer(unsigned w, unsigned h, std::string const& file, Scene const& scene);
 
-
+  void Renderer::rapid_prototyping();
   void render();
   Color trace(Ray const& r);
   Color shade(Ray const& r, std::shared_ptr<Shape> const& s, HitPoint const& h);
