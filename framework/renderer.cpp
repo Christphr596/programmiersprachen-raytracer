@@ -27,6 +27,9 @@ Renderer::Renderer(unsigned w, unsigned h, std::string const& file, Scene const&
 
 Color Renderer::shade(Ray const& r, std::shared_ptr<Shape> const& s, HitPoint const& h) {
 
+    glm::vec3 normale = s->normale(h.point);
+    glm::vec3 point = h.point + 0.1f * normale;
+
     float red = 0.0f;
     float green = 0.0f;
     float blue = 0.0f;
@@ -42,15 +45,12 @@ Color Renderer::shade(Ray const& r, std::shared_ptr<Shape> const& s, HitPoint co
 
         bool visible = true;
         for (auto i : scene_.shape_container) {
-            if (i->get_name() != s->get_name()) {
-                HitPoint barrier = i->intersect(Ray{ h.point, light_vec });
+                HitPoint barrier = i->intersect(Ray{ point, light_vec });
 
                 if (barrier.cut && barrier.distance < glm::distance(l->position, h.point) && barrier.distance > 0) {
                     visible = false;
                     break;
                 }
-
-            }
             
         }
 
@@ -59,7 +59,7 @@ Color Renderer::shade(Ray const& r, std::shared_ptr<Shape> const& s, HitPoint co
         }
     }
 
-    glm::vec3 normale = s->normale(h.point);
+    
 
     for (auto [l, l_vec] : spotlights_vec) {
         float skalar_n_l_vec = std::max( glm::dot(normale, l_vec), 0.0f);
