@@ -30,6 +30,7 @@ public:
   Color trace(Ray const& r);
   Color shade(Ray const& r, std::shared_ptr<Shape> const& s, HitPoint const& h);
   void write(Pixel const& p);
+  void rapid_prototyping(); //
 
   inline std::vector<Color> const& color_buffer() const
   {

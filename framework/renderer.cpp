@@ -14,14 +14,27 @@
 
 
 Renderer::Renderer(unsigned w, unsigned h, std::string const& file, Scene const& scene)
-  : width_(w)
-  , height_(h)
-  , color_buffer_(w*h, Color{0.0, 0.0, 0.0})
-  , filename_(file)
-  , ppm_(width_, height_)
-  , scene_(scene)
+    : width_(w)
+    , height_(h)
+    , color_buffer_(w* h, Color{ 0.0, 0.0, 0.0 })
+    , filename_(file)
+    , ppm_(width_, height_)
+    , scene_(scene)
 {}
-
+//
+void Renderer::rapid_prototyping() {
+    for (auto & s : scene_.camera_container) {
+        float distance = s->dis(width_, height_);
+        float haight = s->height(width_, height_);
+        for (unsigned int i = -(width_%2);i <= width_/2; i++) {
+            for (unsigned int j = -(height_%2); j <= height_%2; j++){
+                Ray ray = s->ray_gen(j, distance, haight, width_);
+            }
+            Ray ray = s->ray_gen(i, distance, haight, width_);
+        }
+    }
+}
+//
 Color Renderer::shade(Ray const& r, std::shared_ptr<Shape> const& s, HitPoint const& h) {
 
     return Color{ h.material->ka.r * 0.5f, h.material->ka.g * 0.5f, h.material->ka.b * 0.5f };
