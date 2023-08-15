@@ -7,6 +7,11 @@
 // Renderer
 // -----------------------------------------------------------------------------
 
+#include <map>
+#include <memory>
+#include <utility>
+#include <cmath>
+#include <algorithm>
 #include "renderer.hpp"
 #include "sphere.hpp"
 
@@ -37,7 +42,55 @@ void Renderer::rapid_prototyping() {
 
 Color Renderer::shade(Ray const& r, std::shared_ptr<Shape> const& s, HitPoint const& h) {
 
-    return Color{ h.material->ka.r * 0.5f, h.material->ka.g * 0.5f, h.material->ka.b * 0.5f };
+    glm::vec3 normale = s->normale(h.point);
+    glm::vec3 point = h.point + 0.1f * normale;
+
+    float red = 0.0f;
+    float green = 0.0f;
+    float blue = 0.0f;
+
+    red += h.material->ka.r * 0.5f;
+    green += h.material->ka.g * 0.5f;
+    blue += h.material->ka.b * 0.5f;
+
+    std::map<std::shared_ptr<Light>, glm::vec3> spotlights_vec{};
+
+    for (auto l : scene_.light_container) {
+        glm::vec3 light_vec = glm::normalize((l->position) - h.point);
+
+        bool visible = true;
+        for (auto i : scene_.shape_container) {
+                HitPoint barrier = i->intersect(Ray{ point, light_vec });
+
+                if (barrier.cut && barrier.distance < glm::distance(l->position, h.point) && barrier.distance > 0) {
+                    visible = false;
+                    break;
+                }
+            
+        }
+
+        if (visible) {
+            spotlights_vec.insert(std::make_pair(l, light_vec));
+        }
+    }
+
+    
+
+    for (auto [l, l_vec] : spotlights_vec) {
+        float skalar_n_l_vec = std::max( glm::dot(normale, l_vec), 0.0f);
+
+        glm::vec3 r = glm::normalize(2 * skalar_n_l_vec * normale - l_vec);
+        glm::vec3 v = glm::normalize(glm::vec3{ 0.0f, 0.0f, 0.0f } - h.point);
+        float skalar_r_v = glm::dot(r, v);
+
+        red += l->color.r * l->brightness * (h.material->kd.r * skalar_n_l_vec + h.material->ks.r * std::pow(skalar_r_v, h.material->m));
+        green += l->color.g * l->brightness * (h.material->kd.g * skalar_n_l_vec + h.material->ks.g * std::pow(skalar_r_v, h.material->m));
+        blue += l->color.b * l->brightness * (h.material->kd.b * skalar_n_l_vec + h.material->ks.b * std::pow(skalar_r_v, h.material->m));
+    }
+
+    
+
+    return Color{red, green, blue};
 
 }
 
@@ -73,7 +126,8 @@ void Renderer::render() {
         for (unsigned x = 0; x < width_; ++x) {
             Pixel p{ x,y };
             Ray r{ glm::vec3{0.0f, 0.0f, 0.0f}, glm::normalize( glm::vec3{(-200.0f + float(x* 1.0f)), (-200.0f + float(y * 1.0f)), -400.0f})};
-            p.color = trace(r);
+            Color c = trace(r);
+            p.color = Color{ c.r / (c.r + 1), c.g / (c.g + 1), c.b / (c.b + 1) };
 
             write(p);
         }

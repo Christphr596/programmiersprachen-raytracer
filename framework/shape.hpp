@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <glm/vec3.hpp>
 #include "color.hpp"
 #include "material.hpp"
 #include "hitpoint.hpp"
@@ -20,6 +21,7 @@ public:
 	std::shared_ptr<Material> get_material() const;
 
 	virtual HitPoint intersect(Ray const& r) = 0;
+	virtual glm::vec3 normale(glm::vec3 const& point) = 0;
 
 	//virtual ~Shape();
 

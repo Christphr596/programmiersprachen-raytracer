@@ -19,6 +19,8 @@ public:
 	std::ostream& print(std::ostream& os) const;
 	HitPoint intersect(Ray const& r) override;
 
+	glm::vec3 normale(glm::vec3 const& point) override;
+
 	//~Box();
 
 private: 

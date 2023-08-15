@@ -47,3 +47,8 @@ std::ostream& Sphere::print(std::ostream& os)const{
 	os << "Center: " << "{" << center_.r << "; " << center_.g << "; " << center_.b << "}; " << "Radius: " << radius_;
 	return os;
 }
+
+glm::vec3 Sphere::normale(glm::vec3 const& point)
+{
+	return glm::normalize(point - center_);
+}
