@@ -81,7 +81,7 @@ Color Renderer::shade(Ray const& r, std::shared_ptr<Shape> const& s, HitPoint co
 
         glm::vec3 r = glm::normalize(2 * skalar_n_l_vec * normale - l_vec);
         glm::vec3 v = glm::normalize(glm::vec3{ 0.0f, 0.0f, 0.0f } - h.point);
-        float skalar_r_v = glm::dot(r, v);
+        float skalar_r_v = std::max(glm::dot(r, v), 0.0f);
 
         red += l->color.r * l->brightness * (h.material->kd.r * skalar_n_l_vec + h.material->ks.r * std::pow(skalar_r_v, h.material->m));
         green += l->color.g * l->brightness * (h.material->kd.g * skalar_n_l_vec + h.material->ks.g * std::pow(skalar_r_v, h.material->m));
