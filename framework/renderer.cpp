@@ -14,6 +14,7 @@
 #include <algorithm>
 #include "renderer.hpp"
 #include "sphere.hpp"
+#define OWN_PI 3.14159265359f
 
 
 Renderer::Renderer(unsigned w, unsigned h, std::string const& file, Scene const& scene)
@@ -25,7 +26,7 @@ Renderer::Renderer(unsigned w, unsigned h, std::string const& file, Scene const&
   , scene_(scene)
 {}
 
-
+/*
 void Renderer::rapid_prototyping() {
     for (auto& s : scene_.camera_container) {
         float distance = s->dis(width_, height_);
@@ -37,7 +38,7 @@ void Renderer::rapid_prototyping() {
             Ray ray = s->ray_gen(i, distance, haight, width_);
         }
     }
-}
+}*/
 
 
 Color Renderer::shade(Ray const& r, std::shared_ptr<Shape> const& s, HitPoint const& h) {
@@ -122,10 +123,15 @@ Color Renderer::trace(Ray const& r) {
 
 void Renderer::render() {
 
+    float a = std::tan((scene_.camera_container.front()->fov_x / 2.0f) / 180.0f * OWN_PI);
+
+    float d = (width_ / 2.0f) / std::tan((scene_.camera_container.front()->fov_x / 2)/180 * OWN_PI);
+
     for (unsigned y = 0; y < height_; ++y) {
         for (unsigned x = 0; x < width_; ++x) {
             Pixel p{ x,y };
-            Ray r{ glm::vec3{0.0f, 0.0f, 0.0f}, glm::normalize( glm::vec3{(-200.0f + float(x* 1.0f)), (-200.0f + float(y * 1.0f)), -400.0f})};
+
+            Ray r{ glm::vec3{0.0f, 0.0f, 0.0f}, glm::normalize( glm::vec3{(-(width_/2.0f) + float(x* 1.0f)), (-(height_/2.0f) + float(y * 1.0f)), -d})};
             Color c = trace(r);
             p.color = Color{ c.r / (c.r + 1), c.g / (c.g + 1), c.b / (c.b + 1) };
 

@@ -10,8 +10,8 @@
 //now single threaded again
 int main(int argc, char* argv[])
 {
-  unsigned const image_width = 401/*800*/;
-  unsigned const image_height = 401/*600*/;
+  unsigned const image_width = /*401*/800;
+  unsigned const image_height = /*401*/600;
   std::string const filename = "./checkerboard.ppm";
   
   Scene s = parse_sdf("C:\\Users\\Annika\\00UNI\\SE1\\07Raytracer\\programmiersprachen-raytracer\\test_1.sdf");

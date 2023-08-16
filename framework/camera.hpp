@@ -14,6 +14,8 @@ struct Camera {
 	glm::vec3 dir = { 0,0,0 };
 	glm::vec3 up = { 0,0,0 };
 
+	/*
+
 	float Camera::dis(unsigned const width_, unsigned const height_) const {
 		float distance = (width_ / 2) / sin((fov_x / 2) * OWN_PI / 180);
 		return distance;
@@ -33,5 +35,5 @@ struct Camera {
 		Ray ray = { eye, act_vec };
 
 		return ray;
-	}
+	}*/
 };
