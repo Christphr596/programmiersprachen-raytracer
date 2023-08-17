@@ -23,6 +23,11 @@ float Composite::area() const {
 	return 0;
 }
 
+glm::vec3 Composite::normale(glm::vec3 const& point) {
+	glm::vec3 vec{ 0,0,0 };
+	return vec;
+}
+
 float Composite::volume() const {
 	return 0;
 }

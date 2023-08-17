@@ -1,10 +1,11 @@
+#pragma once
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <array>
 #include <vector>
-
+#include "composite.hpp"
 
 #include "scene.hpp"
 
@@ -121,6 +122,25 @@ Scene parse_sdf(std::string const& sdf_path) {
 
 					Sphere sphere{ name,  glm::vec3{vec[0], vec[1], vec[2]}, radius, mat };
 					scene.shape_container.push_back(std::make_shared<Sphere>(sphere));
+				}
+				if (token == "composite") {
+
+					std::string name;
+					string_stream >> name;
+
+					Composite composite{ name };
+
+					std::istringstream line;
+					std::string new_word;
+					while (line >> new_word) {
+						for (auto const& i : scene.all_shapes) {
+							if (i->get_name() == new_word) {
+								composite.add_shape(i);
+								//scene.all_shapes.erase(i);
+							}
+						}
+					}
+
 				}
 
 			}

@@ -1,3 +1,9 @@
+
+//#pragma once
+
+#ifndef COMPOSITE_HPP
+#define COMPOSITE_HPP
+
 #include <glm/vec3.hpp>
 #include <string>
 #include "shape.hpp"
@@ -16,6 +22,8 @@ public:
 	std::vector<std::shared_ptr<Shape>> get_children()const;
 
 	float area() const override;
+	glm::vec3 normale(glm::vec3 const& point) override;
+
 	float volume() const override;
 	HitPoint intersect(Ray const& r) override;
 
@@ -23,3 +31,6 @@ private:
 	std::string name_ = "";
 	std::vector<std::shared_ptr<Shape>> container;
 };
+
+
+#endif
