@@ -26,8 +26,8 @@ Scene parse_sdf(std::string const& sdf_path) {
 		std::istringstream string_stream{ line_buffer };
 
 		std::string token;
-
 		string_stream >> token;
+
 		if (token == "define") {
 			string_stream >> token;
 
@@ -96,9 +96,9 @@ Scene parse_sdf(std::string const& sdf_path) {
 					std::shared_ptr<Material> mat = scene.material_container[name_mat];
 
 					Box box{ name, glm::vec3{vec1[0], vec1[1], vec1[2]},  glm::vec3{vec2[0], vec2[1], vec2[2]}, mat };
-					scene.shape_container.push_back(std::make_shared<Box>(box));
-
+					scene.all_shapes.push_back(std::make_shared<Box>(box)); //in zwischenspeicher packen und mit composite auslesen
 				}
+
 				if (token == "sphere") {
 
 					std::string name;
@@ -120,8 +120,28 @@ Scene parse_sdf(std::string const& sdf_path) {
 					std::shared_ptr<Material> mat = scene.material_container[name_mat];
 
 					Sphere sphere{ name,  glm::vec3{vec[0], vec[1], vec[2]}, radius, mat };
-					scene.shape_container.push_back(std::make_shared<Sphere>(sphere));
+					scene.all_shapes.push_back(std::make_shared<Sphere>(sphere));
 				}
+				/*
+				if (token == "composite") {
+
+					std::string name;
+					string_stream >> name;
+
+					Composite composite{name};
+					
+					std::istringstream line;
+					std::string new_word;
+					while (line >> new_word) {
+						for (auto const& i : scene.all_shapes){
+							if (i->get_name() == new_word) {
+								composite.add_shape(i);
+								//scene.all_shapes.erase(i);
+							}
+						}
+					}
+
+				}*/
 
 			}
 
