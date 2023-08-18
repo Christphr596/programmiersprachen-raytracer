@@ -1,5 +1,8 @@
 #pragma once
 
+#ifndef BOX_HPP
+#define BOX_HPP
+
 #include <glm/vec3.hpp>
 #include <string>
 #include "shape.hpp"
@@ -27,3 +30,5 @@ private:
 	glm::vec3 min_ = { 0,0,0 };
 	glm::vec3 max_ = { 0,0,0 };
 };
+
+#endif
