@@ -200,7 +200,58 @@ Scene parse_sdf(std::string const& sdf_path) {
 				Camera camera{ name, fov_x, glm::vec3{eye[0], eye[1], eye[2]},  glm::vec3{dir[0], dir[1], dir[2]}, glm::vec3{up[0], up[1], up[2]} };
 				scene.camera_container.push_back(std::make_shared<Camera>(camera));
 			}
-			
+			if (token == "transform") {
+				float value;
+				std::string name;
+				string_stream >> name;
+
+				for (auto it : scene.all_shapes) {
+					if (it->get_name() == name) {
+						string_stream >> token;
+
+
+						if (token == "scale") {
+
+							std::array<float, 3> scale{};
+							for (int i = 0; i < scale.size(); ++i) {
+								string_stream >> value;
+								scale[i] = value;
+							}
+
+							//it->scale(glm::vec3{ scale[0], scale[1], scale[2] });
+						}
+
+
+						if (token == "translate") {
+
+							std::array<float, 3> trans{};
+							for (int i = 0; i < trans.size(); ++i) {
+								string_stream >> value;
+								trans[i] = value;
+							}
+
+							//it->translate(glm::vec3{ trans[0], trans[1], trans[2] });
+						}
+
+
+						if (token == "rotate") {
+
+							float degree = 0.0f;
+							string_stream >> degree;
+
+							std::array<float, 3> rot{};
+							for (int i = 0; i < rot.size(); ++i) {
+								string_stream >> value;
+								rot[i] = value;
+							}
+
+							//it->rotate(degree, glm::vec3{ rot[0], rot[1], rot[2] });
+
+						}
+					}
+				}
+
+			}
 
 		}
 
