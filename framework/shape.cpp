@@ -36,7 +36,7 @@ void Shape::scale(glm::vec3 const& scale_vec) {
 	scale_mat[3] = glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f };
 
 	world_transformation_ = scale_mat * world_transformation_;
-	//inverse Matrix
+	world_transformation_inv_ = glm::inverse(world_transformation_);
 
 }
 
@@ -63,7 +63,7 @@ void Shape::rotate(float degree, glm::vec3 const& rotation_axis) {
 	}
 
 	world_transformation_ = rotation_mat * world_transformation_;
-	//inverse Matrix
+	world_transformation_inv_ = glm::inverse(world_transformation_);
 
 }
 
@@ -78,5 +78,5 @@ void Shape::translte(glm::vec3 const& translation_vec) {
 	translation_mat[0] = glm::vec4{ translation_vec, 1.0f };
 
 	world_transformation_ = translation_mat * world_transformation_;
-	//inverse Matrix
+	world_transformation_inv_ = glm::inverse(world_transformation_);
 }
