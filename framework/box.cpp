@@ -130,7 +130,7 @@ HitPoint Box::intersect(Ray const& r) {
 
 glm::vec3 Box::normale(glm::vec3 const& point)
 {
-	glm::vec4 point_transformed{point.x, point.y, point.z, 1.0f};
+	glm::vec4 point_transformed = Shape::get_w_t_inv_mat() * glm::vec4{point, 1.0f};
 
 	float eps = 0.1f;
 
