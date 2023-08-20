@@ -103,17 +103,15 @@ Color Renderer::trace(Ray const& r) {
 
     for (auto s : scene_.shape_container) {
         Ray r_transformed = transform(s->get_w_t_inv_mat(), r);
-        HitPoint hp = s->intersect(r);
+        HitPoint hp = s->intersect(r_transformed);
         if (hp.cut) {
             if (hp.distance < closest_hp.distance) {
-                closest_hp = hp;
+                closest_hp = transform(s->get_w_t_mat(), hp)/*hp*/;
                 closest_s = s;
             }
         }
         
     }
-
-    closest_hp = transform(closest_s->get_w_t_mat(), closest_hp);
 
     if (closest_hp.cut) {
         return shade(r, closest_s, closest_hp);
