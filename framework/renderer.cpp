@@ -102,6 +102,7 @@ Color Renderer::trace(Ray const& r) {
     std::shared_ptr<Shape> closest_s{};
 
     for (auto s : scene_.shape_container) {
+        Ray r_transformed = transform(s->get_w_t_inv_mat(), r);
         HitPoint hp = s->intersect(r);
         if (hp.cut) {
             if (hp.distance < closest_hp.distance) {
@@ -111,6 +112,8 @@ Color Renderer::trace(Ray const& r) {
         }
         
     }
+
+    closest_hp = transform(closest_s->get_w_t_mat(), closest_hp);
 
     if (closest_hp.cut) {
         return shade(r, closest_s, closest_hp);
