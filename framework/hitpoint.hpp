@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <glm/vec3.hpp>
 #include <limits>
+#include <memory>
+#include "material.hpp"
 
 #ifndef HITPOINT_HPP
 #define HITPOINT_HPP
@@ -17,5 +19,6 @@ struct HitPoint
 	glm::vec3 direction = { 0.0, 0.0, 0.0 };
 };
 
+HitPoint transform(glm::mat4 const& mat, HitPoint const& hp);
 
 #endif
