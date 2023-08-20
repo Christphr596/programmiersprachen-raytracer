@@ -80,3 +80,11 @@ void Shape::translte(glm::vec3 const& translation_vec) {
 	world_transformation_ = translation_mat * world_transformation_;
 	world_transformation_inv_ = glm::inverse(world_transformation_);
 }
+
+glm::mat4 Shape::get_w_t_mat() {
+	return world_transformation_;
+}
+
+glm::mat4 Shape::get_w_t_inv_mat() {
+	return world_transformation_inv_;
+}
