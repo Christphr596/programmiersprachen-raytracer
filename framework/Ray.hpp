@@ -12,5 +12,7 @@ struct Ray
 	glm::vec3 direction = { 0.0f, 0.0f, -1.0f };
 };
 
+Ray transform(glm::mat4 const& mat, Ray const& r);
+
 
 #endif

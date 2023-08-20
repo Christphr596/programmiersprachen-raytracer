@@ -130,26 +130,33 @@ HitPoint Box::intersect(Ray const& r) {
 
 glm::vec3 Box::normale(glm::vec3 const& point)
 {
+	glm::vec4 point_transformed = Shape::get_w_t_inv_mat() * glm::vec4{point, 1.0f};
+
 	float eps = 0.1f;
 
-	if (std::abs(point.x - min_.x) < eps) {
-		return glm::vec3{-1.0f, 0.0f, 0.0f};
+	glm::vec4 normale{};
+
+	if (std::abs(point_transformed.x - min_.x) < eps) {
+		normale = glm::vec4{ -1.0f, 0.0f, 0.0f, 0.0f};
 	}
-	else if (std::abs(point.x - max_.x) < eps) {
-		return glm::vec3{ 1.0f, 0.0f, 0.0f };
+	else if (std::abs(point_transformed.x - max_.x) < eps) {
+		normale = glm::vec4{ 1.0f, 0.0f, 0.0f, 0.0f };
 	}
-	else if (std::abs(point.y - min_.y) < eps) {
-		return glm::vec3{ 0.0f, -1.0f, 0.0f };
+	else if (std::abs(point_transformed.y - min_.y) < eps) {
+		normale = glm::vec4{ 0.0f, -1.0f, 0.0f, 0.0f };
 	}
-	else if (std::abs(point.y - max_.y) < eps) {
-		return glm::vec3{ 0.0f, 1.0f, 0.0f };
+	else if (std::abs(point_transformed.y - max_.y) < eps) {
+		normale = glm::vec4{ 0.0f, 1.0f, 0.0f, 0.0f };
 	}
-	else if (std::abs(point.z - min_.z) < eps) {
-		return glm::vec3{ 0.0f, 0.0f, -1.0f };
+	else if (std::abs(point_transformed.z - min_.z) < eps) {
+		normale = glm::vec4{ 0.0f, 0.0f, -1.0f, 0.0f };
 	}
-	else if (std::abs(point.z - max_.z) < eps) {
-		return glm::vec3{ 0.0f, 0.0f, 1.0f };
+	else if (std::abs(point_transformed.z - max_.z) < eps) {
+		normale = glm::vec4{ 0.0f, 0.0f, 1.0f, 0.0f };
 	}
+
+	normale = glm::transpose(Shape::get_w_t_inv_mat()) * normale;
+	return glm::vec3{ normale.x, normale.y, normale.z };
 
 	//return glm::vec3{0.0f, 0.0f, 0.0f};
 }

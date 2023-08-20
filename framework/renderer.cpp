@@ -12,8 +12,10 @@
 #include <utility>
 #include <cmath>
 #include <algorithm>
+#include <glm/gtc/matrix_access.hpp>
 #include "renderer.hpp"
 #include "sphere.hpp"
+#define OWN_PI 3.14159265359f
 
 
 Renderer::Renderer(unsigned w, unsigned h, std::string const& file, Scene const& scene)
@@ -25,7 +27,7 @@ Renderer::Renderer(unsigned w, unsigned h, std::string const& file, Scene const&
   , scene_(scene)
 {}
 
-
+/*
 void Renderer::rapid_prototyping() {
     for (auto& s : scene_.camera_container) {
         float distance = s->dis(width_, height_);
@@ -37,7 +39,7 @@ void Renderer::rapid_prototyping() {
             Ray ray = s->ray_gen(i, distance, haight, width_);
         }
     }
-}
+}*/
 
 
 Color Renderer::shade(Ray const& r, std::shared_ptr<Shape> const& s, HitPoint const& h) {
@@ -100,10 +102,11 @@ Color Renderer::trace(Ray const& r) {
     std::shared_ptr<Shape> closest_s{};
 
     for (auto s : scene_.shape_container) {
-        HitPoint hp = s->intersect(r);
+        Ray r_transformed = transform(s->get_w_t_inv_mat(), r);
+        HitPoint hp = s->intersect(r_transformed);
         if (hp.cut) {
             if (hp.distance < closest_hp.distance) {
-                closest_hp = hp;
+                closest_hp = transform(s->get_w_t_mat(), hp)/*hp*/;
                 closest_s = s;
             }
         }
@@ -122,10 +125,26 @@ Color Renderer::trace(Ray const& r) {
 
 void Renderer::render() {
 
+    std::shared_ptr<Camera> c = scene_.camera_container.front();
+
+    float d = (width_ / 2.0f) / std::tan((scene_.camera_container.front()->fov_x / 2) / 180 * OWN_PI);
+
+    glm::mat4 camera_mat{};
+    camera_mat[0] = glm::vec4(glm::cross(c->dir, c->up), 0);
+    camera_mat[1] = glm::vec4(glm::cross(glm::cross(c->dir, c->up), c->dir), 0);
+    camera_mat[2] = glm::vec4(-1.0f * (c->dir), 0);
+    camera_mat[3] = glm::vec4(c->eye, 1);
+    
+
     for (unsigned y = 0; y < height_; ++y) {
         for (unsigned x = 0; x < width_; ++x) {
             Pixel p{ x,y };
-            Ray r{ glm::vec3{0.0f, 0.0f, 0.0f}, glm::normalize( glm::vec3{(-200.0f + float(x* 1.0f)), (-200.0f + float(y * 1.0f)), -400.0f})};
+
+            glm::vec4 ray_direction{ glm::normalize(glm::vec3{(-(width_ / 2.0f) + float(x * 1.0f)), (-(height_ / 2.0f) + float(y * 1.0f)), -d}), 0 };
+
+            ray_direction = camera_mat * ray_direction;
+
+            Ray r{ c->eye, glm::vec3{ray_direction.x, ray_direction.y, ray_direction.z} };
             Color c = trace(r);
             p.color = Color{ c.r / (c.r + 1), c.g / (c.g + 1), c.b / (c.b + 1) };
 
