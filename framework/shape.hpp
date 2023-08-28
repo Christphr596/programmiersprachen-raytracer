@@ -26,7 +26,7 @@ public:
 
 	void scale(glm::vec3 const& scale_vec);
 	void rotate(float degree, glm::vec3  const& rotation_axis);
-	void translte(glm::vec3 const& translation_vec);
+	void translate(glm::vec3 const& translation_vec);
 	glm::mat4 get_w_t_mat();
 	glm::mat4 get_w_t_inv_mat();
 

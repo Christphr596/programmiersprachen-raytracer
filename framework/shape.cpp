@@ -68,14 +68,14 @@ void Shape::rotate(float degree, glm::vec3 const& rotation_axis) {
 }
 
 
-void Shape::translte(glm::vec3 const& translation_vec) {
+void Shape::translate(glm::vec3 const& translation_vec) {
 
 	glm::mat4 translation_mat{};
 
 	translation_mat[0] = glm::vec4{1.0f, 0.0f, 0.0f, 0.0f};
 	translation_mat[1] = glm::vec4{ 0.0f, 1.0f, 0.0f, 0.0f };
 	translation_mat[2] = glm::vec4{ 0.0f, 0.0f, 1.0f, 0.0f };
-	translation_mat[0] = glm::vec4{ translation_vec, 1.0f };
+	translation_mat[3] = glm::vec4{ translation_vec, 1.0f };
 
 	world_transformation_ = translation_mat * world_transformation_;
 	world_transformation_inv_ = glm::inverse(world_transformation_);
