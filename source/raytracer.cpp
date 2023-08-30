@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
       std::cout << i->get_w_t_mat()[3][0] << " " << i->get_w_t_mat()[3][1] << " " << i->get_w_t_mat()[3][2] << " " << i->get_w_t_mat()[3][3] << "\n";
   }
   
-  Renderer renderer{image_width, image_height, filename, s/*parse_sdf("C:\\Users\\Annika\\00UNI\\SE1\\07Raytracer\\programmiersprachen-raytracer\\test_1.sdf")*/};
+  Renderer renderer{image_width, image_height, filename, parse_sdf("C:\\Users\\Annika\\00UNI\\SE1\\07Raytracer\\programmiersprachen-raytracer\\test_1.sdf")};
 
   renderer.render();
 

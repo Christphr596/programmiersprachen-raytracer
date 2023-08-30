@@ -23,23 +23,19 @@ Sphere::Sphere(std::string const& name, glm::vec3 const& center, float radius, s
 
 }
 
-float Sphere::area() const{
 
-	return abs(radius_) * abs(radius_) * OWN_PI * 4;
-}
+HitPoint Sphere::intersect(Ray const& r_original) {
+	Ray r = transform(Shape::get_w_t_inv_mat(), r_original);
 
-float Sphere::volume() const{
-	return (4.0f / 3.0f * OWN_PI * abs(radius_) * abs(radius_) * abs(radius_));
-}
-
-HitPoint Sphere::intersect(Ray const& ray) {
 	float distance = 0.0f;
-	glm::normalize(ray.direction);
-	bool cut = glm::intersectRaySphere(ray.origin, ray.direction, center_, radius_ * radius_, distance);
-	std::pair<std::string, std::shared_ptr<Material>> n_c = Shape::get_n_c();
-	HitPoint hitpoint{ cut, distance, n_c.first, n_c.second, ray.origin + distance * ray.direction, ray.direction };
-	
-	return(hitpoint);
+	//glm::normalize(r.direction);
+	bool cut = glm::intersectRaySphere(r.origin, r.direction, center_, radius_ * radius_, distance);
+	//std::pair<std::string, std::shared_ptr<Material>> n_c = Shape::get_n_c();
+
+	HitPoint hitpoint{ cut, distance,Shape::get_name() /*n_c.first*/, Shape::get_material()/* n_c.second*/, r.origin + distance * r.direction, r.direction, normale(r.origin + distance * r.direction)};
+
+	hitpoint = transform(Shape::get_w_t_mat(), hitpoint);
+	return hitpoint;
 }
 
 std::ostream& Sphere::print(std::ostream& os)const{
@@ -49,8 +45,8 @@ std::ostream& Sphere::print(std::ostream& os)const{
 }
 
 glm::vec3 Sphere::normale(glm::vec3 const& point)
-{	glm::vec4 center_transformed = Shape::get_w_t_mat() * glm::vec4{ center_, 1.0f };
-	return glm::normalize(point - glm::vec3{ center_transformed .x, center_transformed .y, center_transformed .z});
+{	//glm::vec4 center_transformed = Shape::get_w_t_mat() * glm::vec4{ center_, 1.0f };
+	return glm::normalize(point - center_/*glm::vec3{center_transformed.x, center_transformed.y, center_transformed.z}*/);
 
 	//glm::vec4 normale{};
 	//glm::vec4 point_transformed = Shape::get_w_t_inv_mat() * glm::vec4{ point, 1.0f };
