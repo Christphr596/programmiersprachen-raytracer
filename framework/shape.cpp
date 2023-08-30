@@ -28,6 +28,15 @@ std::shared_ptr<Material> Shape::get_material() const {
 	return material_;
 }
 
+
+glm::mat4 Shape::get_w_t_mat() const {
+	return world_transformation_;
+}
+
+glm::mat4 Shape::get_w_t_inv_mat() const{
+	return world_transformation_inv_;
+}
+
 void Shape::scale(glm::vec3 const& scale_vec) {
 	glm::mat4 scale_mat{};
 	scale_mat[0] = glm::vec4{scale_vec.x, 0.0f, 0.0f, 0.0f};
@@ -35,8 +44,7 @@ void Shape::scale(glm::vec3 const& scale_vec) {
 	scale_mat[2] = glm::vec4{ 0.0f, 0.0f, scale_vec.z, 0.0f };
 	scale_mat[3] = glm::vec4{ 0.0f, 0.0f, 0.0f, 1.0f };
 
-	world_transformation_ = scale_mat * world_transformation_;
-	world_transformation_inv_ = glm::inverse(world_transformation_);
+	Shape::scale_mat_ = scale_mat * Shape::scale_mat_;
 
 }
 
@@ -62,8 +70,7 @@ void Shape::rotate(float degree, glm::vec3 const& rotation_axis) {
 		rotation_mat[2] = glm::vec4{ 0.0f, 0.0f, 1.0f, 0.0f };
 	}
 
-	world_transformation_ = rotation_mat * world_transformation_;
-	world_transformation_inv_ = glm::inverse(world_transformation_);
+	Shape::rotation_mat_ = rotation_mat * Shape::rotation_mat_;
 
 }
 
@@ -77,14 +84,11 @@ void Shape::translate(glm::vec3 const& translation_vec) {
 	translation_mat[2] = glm::vec4{ 0.0f, 0.0f, 1.0f, 0.0f };
 	translation_mat[3] = glm::vec4{ translation_vec, 1.0f };
 
-	world_transformation_ = translation_mat * world_transformation_;
+	Shape::translation_mat_ =  translation_mat * Shape::translation_mat_;
+}
+
+
+void Shape::update_w_t_mat() {
+	world_transformation_ = translation_mat_ * rotation_mat_ * scale_mat_;
 	world_transformation_inv_ = glm::inverse(world_transformation_);
-}
-
-glm::mat4 Shape::get_w_t_mat() {
-	return world_transformation_;
-}
-
-glm::mat4 Shape::get_w_t_inv_mat() {
-	return world_transformation_inv_;
 }
