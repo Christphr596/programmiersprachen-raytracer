@@ -13,6 +13,8 @@
 
 Scene parse_sdf(std::string const& sdf_path) {
 	
+	std::map<std::string, std::shared_ptr<Shape>> open_shapes;
+	int size = open_shapes.size();
 
 	Scene scene{};
 
@@ -124,7 +126,7 @@ Scene parse_sdf(std::string const& sdf_path) {
 					Sphere sphere{ name,  glm::vec3{vec[0], vec[1], vec[2]}, radius, mat };
 					scene.shape_container.push_back(std::make_shared<Sphere>(sphere));
 				}
-				/*
+				
 				if (token == "composite") {
 
 					std::string name;
@@ -143,7 +145,7 @@ Scene parse_sdf(std::string const& sdf_path) {
 						}
 					}
 
-				}*/
+				}
 
 			}
 
@@ -263,6 +265,12 @@ Scene parse_sdf(std::string const& sdf_path) {
 		}
 
 	}
+
+	for (auto it : open_shapes) {
+		scene.ptr_->add_shape(it.second);
+		open_shapes.erase(it.first);
+	}
+
 	return scene;
 }
 

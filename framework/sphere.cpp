@@ -23,14 +23,6 @@ Sphere::Sphere(std::string const& name, glm::vec3 const& center, float radius, s
 
 }
 
-float Sphere::area() const{
-
-	return abs(radius_) * abs(radius_) * OWN_PI * 4;
-}
-
-float Sphere::volume() const{
-	return (4.0f / 3.0f * OWN_PI * abs(radius_) * abs(radius_) * abs(radius_));
-}
 
 HitPoint Sphere::intersect(Ray const& r_original) {
 	Ray r = transform(Shape::get_w_t_inv_mat(), r_original);
