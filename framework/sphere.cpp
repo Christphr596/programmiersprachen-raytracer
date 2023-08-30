@@ -49,7 +49,12 @@ std::ostream& Sphere::print(std::ostream& os)const{
 }
 
 glm::vec3 Sphere::normale(glm::vec3 const& point)
-{
-	glm::vec4 center_transformed = Shape::get_w_t_mat() * glm::vec4{ center_, 1.0f };
+{	glm::vec4 center_transformed = Shape::get_w_t_mat() * glm::vec4{ center_, 1.0f };
 	return glm::normalize(point - glm::vec3{ center_transformed .x, center_transformed .y, center_transformed .z});
+
+	//glm::vec4 normale{};
+	//glm::vec4 point_transformed = Shape::get_w_t_inv_mat() * glm::vec4{ point, 1.0f };
+	//normale = glm::normalize(point_transformed - glm::vec4{ center_, 1.0f });
+	//normale = glm::transpose(Shape::get_w_t_inv_mat()) * normale;
+	//return glm::vec3{ normale.x, normale.y, normale.z };
 }

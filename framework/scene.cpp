@@ -6,6 +6,7 @@
 #include <array>
 #include <vector>
 #include "composite.hpp"
+#include "shape.hpp"
 
 #include "scene.hpp"
 
@@ -123,6 +124,7 @@ Scene parse_sdf(std::string const& sdf_path) {
 					Sphere sphere{ name,  glm::vec3{vec[0], vec[1], vec[2]}, radius, mat };
 					scene.shape_container.push_back(std::make_shared<Sphere>(sphere));
 				}
+				/*
 				if (token == "composite") {
 
 					std::string name;
@@ -141,7 +143,7 @@ Scene parse_sdf(std::string const& sdf_path) {
 						}
 					}
 
-				}
+				}*/
 
 			}
 
@@ -200,12 +202,16 @@ Scene parse_sdf(std::string const& sdf_path) {
 				Camera camera{ name, fov_x, glm::vec3{eye[0], eye[1], eye[2]},  glm::vec3{dir[0], dir[1], dir[2]}, glm::vec3{up[0], up[1], up[2]} };
 				scene.camera_container.push_back(std::make_shared<Camera>(camera));
 			}
+
+			
 			if (token == "transform") {
+
+
 				float value;
 				std::string name;
 				string_stream >> name;
 
-				for (auto it : scene.all_shapes) {
+				for (auto it : scene.shape_container) {
 					if (it->get_name() == name) {
 						string_stream >> token;
 
@@ -217,8 +223,7 @@ Scene parse_sdf(std::string const& sdf_path) {
 								string_stream >> value;
 								scale[i] = value;
 							}
-
-							//it->scale(glm::vec3{ scale[0], scale[1], scale[2] });
+							it->scale(glm::vec3{ scale[0], scale[1], scale[2] });
 						}
 
 
@@ -230,7 +235,7 @@ Scene parse_sdf(std::string const& sdf_path) {
 								trans[i] = value;
 							}
 
-							//it->translate(glm::vec3{ trans[0], trans[1], trans[2] });
+							it->translate(glm::vec3{ trans[0], trans[1], trans[2] });
 						}
 
 
@@ -245,9 +250,11 @@ Scene parse_sdf(std::string const& sdf_path) {
 								rot[i] = value;
 							}
 
-							//it->rotate(degree, glm::vec3{ rot[0], rot[1], rot[2] });
+							it->rotate(degree, glm::vec3{ rot[0], rot[1], rot[2] });
 
 						}
+
+						it->update_w_t_mat();
 					}
 				}
 

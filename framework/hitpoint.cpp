@@ -7,6 +7,6 @@ HitPoint transform(glm::mat4 const& mat, HitPoint const& hp) {
 	point = mat * point;
 	direction = mat * direction;
 
-	return HitPoint{ hp.cut, hp.distance, hp.name, hp.material, glm::vec3{point.x, point.y, point.z}, glm::vec3{direction.x, direction.y, direction.z} };
+	return HitPoint{ hp.cut, hp.distance, hp.name, hp.material, glm::vec3{point.x, point.y, point.z}, glm::normalize( glm::vec3{direction.x, direction.y, direction.z}) };
 
 }
