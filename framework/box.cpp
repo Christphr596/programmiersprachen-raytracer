@@ -35,7 +35,8 @@ std::ostream& Box::print(std::ostream& os)const {
 }
 
 
-HitPoint Box::intersect(Ray const& r) {
+HitPoint Box::intersect(Ray const& r_original) {
+	Ray r = transform(Shape::get_w_t_inv_mat(), r_original);
 
 	HitPoint hitpoint{};
 
@@ -51,8 +52,8 @@ HitPoint Box::intersect(Ray const& r) {
 		z = r.origin.z + dist * r.direction.z;
 
 		if (y >= min_.y && y <= max_.y && z >= min_.z && z <= max_.z) {
-			glm::normalize(r.direction);
-			hitpoint =  HitPoint{ true, dist, Shape::get_n_c().first, Shape::get_n_c().second, glm::vec3{min_.x, y, z}, r.direction };
+			//glm::normalize(r.direction);
+			hitpoint =  HitPoint{ true, dist, Shape::get_name(), Shape::get_material(), glm::vec3{min_.x, y, z}, r.direction, normale(glm::vec3{min_.x, y, z})};
 		}
 	}
 	
@@ -62,8 +63,8 @@ HitPoint Box::intersect(Ray const& r) {
 		z = r.origin.z + dist * r.direction.z;
 
 		if (y >= min_.y && y <= max_.y && z >= min_.z && z <= max_.z) {
-			glm::normalize(r.direction);
-			hitpoint = HitPoint{ true, dist, Shape::get_n_c().first, Shape::get_n_c().second, glm::vec3{max_.x, y, z}, r.direction };
+			//glm::normalize(r.direction);
+			hitpoint = HitPoint{ true, dist, Shape::get_name(), Shape::get_material(), glm::vec3{max_.x, y, z}, r.direction, normale(glm::vec3{max_.x, y, z}) };
 		}
 	}
 
@@ -73,8 +74,8 @@ HitPoint Box::intersect(Ray const& r) {
 		z = r.origin.z + dist * r.direction.z;
 
 		if (x >= min_.x && x <= max_.x && z >= min_.z && z <= max_.z) {
-			glm::normalize(r.direction);
-			hitpoint = HitPoint{ true, dist, Shape::get_name(), Shape::get_material(), glm::vec3{x, min_.y, z}, r.direction};
+			//glm::normalize(r.direction);
+			hitpoint = HitPoint{ true, dist, Shape::get_name(), Shape::get_material(), glm::vec3{x, min_.y, z}, r.direction, normale(glm::vec3{x, min_.y, z}) };
 		}
 	}
 
@@ -84,8 +85,8 @@ HitPoint Box::intersect(Ray const& r) {
 		z = r.origin.z + dist * r.direction.z;
 
 		if (x >= min_.x && x <= max_.x && z >= min_.z && z <= max_.z) {
-			glm::normalize(r.direction);
-			hitpoint = HitPoint{ true, dist, Shape::get_n_c().first, Shape::get_n_c().second, glm::vec3{x, max_.y, z}, r.direction };
+			//glm::normalize(r.direction);
+			hitpoint = HitPoint{ true, dist, Shape::get_name(), Shape::get_material(), glm::vec3{x, max_.y, z}, r.direction, normale(glm::vec3{x, max_.y, z}) };
 		}
 	}
 
@@ -95,8 +96,8 @@ HitPoint Box::intersect(Ray const& r) {
 		y = r.origin.y + dist * r.direction.y;
 
 		if (x >= min_.x && x <= max_.x && y >= min_.y && y <= max_.y) {
-			glm::normalize(r.direction);
-			hitpoint = HitPoint{ true, dist, Shape::get_n_c().first, Shape::get_n_c().second, glm::vec3{x, y, min_.z}, r.direction };
+			//glm::normalize(r.direction);
+			hitpoint = HitPoint{ true, dist, Shape::get_name(), Shape::get_material(), glm::vec3{x, y, min_.z}, r.direction, normale(glm::vec3{x, y, min_.z}) };
 		}
 	}
 
@@ -106,10 +107,11 @@ HitPoint Box::intersect(Ray const& r) {
 		y = r.origin.y + dist * r.direction.y;
 
 		if (x >= min_.x && x <= max_.x && y >= min_.y && y <= max_.y) {
-			glm::normalize(r.direction);
-			hitpoint = HitPoint{ true, dist, Shape::get_n_c().first, Shape::get_n_c().second, glm::vec3{x, y, max_.z}, r.direction };
+			//glm::normalize(r.direction);
+			hitpoint = HitPoint{ true, dist, Shape::get_n_c().first, Shape::get_material(), glm::vec3{x, y, max_.z}, r.direction, normale(glm::vec3{x, y, max_.z}) };
 		}
 	}
+	hitpoint = transform(Shape::get_w_t_mat(), hitpoint);
 
 	return hitpoint;
 
@@ -119,33 +121,34 @@ HitPoint Box::intersect(Ray const& r) {
 
 glm::vec3 Box::normale(glm::vec3 const& point)
 {
-	glm::vec4 point_transformed = Shape::get_w_t_inv_mat() * glm::vec4{point, 1.0f};
+	//glm::vec4 point_transformed = Shape::get_w_t_inv_mat() * glm::vec4{point, 1.0f};
 
 	float eps = 0.1f;
 
-	glm::vec4 normale{};
+	glm::vec3 normale{};
 
-	if (std::abs(point_transformed.x - min_.x) < eps) {
-		normale = glm::vec4{ -1.0f, 0.0f, 0.0f, 0.0f};
+	if (std::abs(point.x - min_.x) < eps) {
+		normale = glm::vec3{ -1.0f, 0.0f, 0.0f};
 	}
-	else if (std::abs(point_transformed.x - max_.x) < eps) {
-		normale = glm::vec4{ 1.0f, 0.0f, 0.0f, 0.0f };
+	else if (std::abs(point.x - max_.x) < eps) {
+		normale = glm::vec3{ 1.0f, 0.0f, 0.0f};
 	}
-	else if (std::abs(point_transformed.y - min_.y) < eps) {
-		normale = glm::vec4{ 0.0f, -1.0f, 0.0f, 0.0f };
+	else if (std::abs(point.y - min_.y) < eps) {
+		normale = glm::vec3{ 0.0f, -1.0f, 0.0f};
 	}
-	else if (std::abs(point_transformed.y - max_.y) < eps) {
-		normale = glm::vec4{ 0.0f, 1.0f, 0.0f, 0.0f };
+	else if (std::abs(point.y - max_.y) < eps) {
+		normale = glm::vec3{ 0.0f, 1.0f, 0.0f};
 	}
-	else if (std::abs(point_transformed.z - min_.z) < eps) {
-		normale = glm::vec4{ 0.0f, 0.0f, -1.0f, 0.0f };
+	else if (std::abs(point.z - min_.z) < eps) {
+		normale = glm::vec3{ 0.0f, 0.0f, -1.0f};
 	}
-	else if (std::abs(point_transformed.z - max_.z) < eps) {
-		normale = glm::vec4{ 0.0f, 0.0f, 1.0f, 0.0f };
+	else if (std::abs(point.z - max_.z) < eps) {
+		normale = glm::vec3{ 0.0f, 0.0f, 1.0f};
 	}
 
-	normale = glm::transpose(Shape::get_w_t_inv_mat()) * normale;
-	return glm::vec3{ normale.x, normale.y, normale.z };
+	//normale = glm::transpose(Shape::get_w_t_inv_mat()) * normale;
+	//return glm::vec3{ normale.x, normale.y, normale.z };
+	return normale;
 
 	//return glm::vec3{0.0f, 0.0f, 0.0f};
 }
