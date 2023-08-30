@@ -81,7 +81,7 @@ Color Renderer::shade(Ray const& ray, std::shared_ptr<Shape> const& s, HitPoint 
         float skalar_n_l_vec = std::max( glm::dot(normale, l_vec), 0.0f);
 
         glm::vec3 r = glm::normalize(2 * skalar_n_l_vec * normale - l_vec);
-        glm::vec3 v = glm::normalize(glm::vec3{ 0.0f, 0.0f, 0.0f } - h.point);
+        glm::vec3 v = glm::normalize(ray.origin - h.point);
         float skalar_r_v = std::max(glm::dot(r, v), 0.0f);
 
         red += l->color.r * l->brightness * (h.material->kd.r * skalar_n_l_vec + h.material->ks.r * std::pow(skalar_r_v, h.material->m));
@@ -89,7 +89,10 @@ Color Renderer::shade(Ray const& ray, std::shared_ptr<Shape> const& s, HitPoint 
             blue += l->color.b * l->brightness * (h.material->kd.b * skalar_n_l_vec + h.material->ks.b * std::pow(skalar_r_v, h.material->m));
     }
 
-    
+    // visualisation of normals
+    //red = (normale.x + 1.0f) / 2.0f;
+    //green = (normale.y + 1.0f) / 2.0f;
+    //blue = (normale.z + 1.0f) / 2.0f;
 
     return Color{red, green, blue};
 
