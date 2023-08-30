@@ -42,9 +42,9 @@ void Renderer::rapid_prototyping() {
 }*/
 
 
-Color Renderer::shade(Ray const& r, std::shared_ptr<Shape> const& s, HitPoint const& h) {
+Color Renderer::shade(Ray const& ray, std::shared_ptr<Shape> const& s, HitPoint const& h) {
 
-    glm::vec3 normale = glm::normalize(s->normale(h.point));
+    glm::vec3 normale = h.normale;/*glm::normalize(s->normale(h.point))*/;
     glm::vec3 point = h.point + 0.1f * normale;
 
     float red = 0.0f;
@@ -57,6 +57,7 @@ Color Renderer::shade(Ray const& r, std::shared_ptr<Shape> const& s, HitPoint co
 
     std::map<std::shared_ptr<Light>, glm::vec3> spotlights_vec{};
 
+    
     for (auto l : scene_.light_container) {
         glm::vec3 light_vec = glm::normalize((l->position) - h.point);
 
@@ -76,8 +77,6 @@ Color Renderer::shade(Ray const& r, std::shared_ptr<Shape> const& s, HitPoint co
         }
     }
 
-    
-
     for (auto [l, l_vec] : spotlights_vec) {
         float skalar_n_l_vec = std::max( glm::dot(normale, l_vec), 0.0f);
 
@@ -86,8 +85,8 @@ Color Renderer::shade(Ray const& r, std::shared_ptr<Shape> const& s, HitPoint co
         float skalar_r_v = std::max(glm::dot(r, v), 0.0f);
 
         red += l->color.r * l->brightness * (h.material->kd.r * skalar_n_l_vec + h.material->ks.r * std::pow(skalar_r_v, h.material->m));
-        green += l->color.g * l->brightness * (h.material->kd.g * skalar_n_l_vec + h.material->ks.g * std::pow(skalar_r_v, h.material->m));
-        blue += l->color.b * l->brightness * (h.material->kd.b * skalar_n_l_vec + h.material->ks.b * std::pow(skalar_r_v, h.material->m));
+            green += l->color.g * l->brightness * (h.material->kd.g * skalar_n_l_vec + h.material->ks.g * std::pow(skalar_r_v, h.material->m));
+            blue += l->color.b * l->brightness * (h.material->kd.b * skalar_n_l_vec + h.material->ks.b * std::pow(skalar_r_v, h.material->m));
     }
 
     
@@ -102,11 +101,11 @@ Color Renderer::trace(Ray const& r) {
     std::shared_ptr<Shape> closest_s{};
 
     for (auto s : scene_.shape_container) {
-        Ray r_transformed =transform(s->get_w_t_inv_mat(), r);
-        HitPoint hp = s->intersect(r_transformed);
+        //Ray r_transformed =transform(s->get_w_t_inv_mat(), r);
+        HitPoint hp = s->intersect(r);
         if (hp.cut) {
             if (hp.distance < closest_hp.distance) {
-                closest_hp = transform(s->get_w_t_mat(), hp)/*hp*/;
+                closest_hp = /*transform(s->get_w_t_mat(), hp)*/hp;
                 closest_s = s;
             }
         }
