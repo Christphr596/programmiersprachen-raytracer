@@ -7,20 +7,26 @@
 #include <cmath>
 #include "scene.hpp"
 
-//now single threaded again
+//now single th
 int main(int argc, char* argv[])
 {
   unsigned const image_width = /*401*/800;
   unsigned const image_height = /*401*/600;
   std::string const filename = "./checkerboard.ppm";
   
-  Scene s = parse_sdf("C:\\Users\\Annika\\00UNI\\SE1\\07Raytracer\\programmiersprachen-raytracer\\test_1.sdf");
+  Scene s = parse_sdf("../../test_1.sdf");
 
+  
   for (auto i: s.shape_container) {
-      std::cout << i->get_name();
+      std::cout << i->get_name() << "\n";
+
+      std::cout << i->get_w_t_mat()[0][0] << " " << i->get_w_t_mat()[0][1] << " " << i->get_w_t_mat()[0][2] << " " << i->get_w_t_mat()[0][3] << "\n" ;
+      std::cout << i->get_w_t_mat()[1][0] << " " << i->get_w_t_mat()[1][1] << " " << i->get_w_t_mat()[1][2] << " " << i->get_w_t_mat()[1][3] << "\n";
+      std::cout << i->get_w_t_mat()[2][0] << " " << i->get_w_t_mat()[2][1] << " " << i->get_w_t_mat()[2][2] << " " << i->get_w_t_mat()[2][3] << "\n";
+      std::cout << i->get_w_t_mat()[3][0] << " " << i->get_w_t_mat()[3][1] << " " << i->get_w_t_mat()[3][2] << " " << i->get_w_t_mat()[3][3] << "\n";
   }
   
-  Renderer renderer{image_width, image_height, filename, parse_sdf("C:\\Users\\Annika\\00UNI\\SE1\\07Raytracer\\programmiersprachen-raytracer\\test_1.sdf")};
+  Renderer renderer{image_width, image_height, filename, s/*parse_sdf("C:\\Users\\Annika\\00UNI\\SE1\\07Raytracer\\programmiersprachen-raytracer\\test_1.sdf")*/};
 
   renderer.render();
 

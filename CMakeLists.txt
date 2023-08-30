@@ -46,6 +46,8 @@ endif()
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/external/${NANOVG_DIRECTORY}/example/Roboto-Regular.ttf DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/external/${NANOVG_DIRECTORY}/example/Roboto-Regular.ttf DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/source/)
 
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/test_1.sdf DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 # Use catch for testing
 set(CATCH_DIRECTORY catch2)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/external/${CATCH_DIRECTORY})
