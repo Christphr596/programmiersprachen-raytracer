@@ -19,17 +19,9 @@
 Composite::Composite(std::string const& name) : Shape{ name, nullptr } {
 };
 
-float Composite::area() const {
-	return 0;
-}
-
 glm::vec3 Composite::normale(glm::vec3 const& point) {
 	glm::vec3 vec{ 0,0,0 };
 	return vec;
-}
-
-float Composite::volume() const {
-	return 0;
 }
 
 HitPoint Composite::intersect(Ray const& ray) {
@@ -39,14 +31,6 @@ HitPoint Composite::intersect(Ray const& ray) {
 
 void Composite::add_shape(std::shared_ptr<Shape> shape) {
 	container.push_back(shape);
-};
-
-void Composite::remove_shape(std::string const& name) {
-	for (auto it : container) {
-		if (it->get_name() == name) {
-			//container.erase(it);
-		}
-	}
 };
 
 std::vector<std::shared_ptr<Shape>> Composite::get_children()const {
