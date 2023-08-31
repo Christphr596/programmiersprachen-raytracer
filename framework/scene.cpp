@@ -142,24 +142,23 @@ Scene parse_sdf(std::string const& sdf_path) {
 
 					Composite composite{ name };
 
-					std::istringstream line;
-					std::string new_word;
-					while (line >> new_word) {
-						/*
-						for (auto const& i : scene.all_shapes) {
-							if (i->get_name() == new_word) {
-								composite.add_shape(i);
-								//scene.all_shapes.erase(i);
-							}
-						}*/
-
-						//auto it = open_shapes.find(new_word);
+					//std::istringstream line;
+					std::string new_word{};
+					
+					while (!string_stream.eof()) {
+						string_stream >> new_word;
 						composite.add_shape(open_shapes.at(new_word));
+						std::cout << name << "*\n";
 						open_shapes.erase(new_word);
+
 					}
+
+					//line_buffer.append( " define");
+						
 					auto composite_ptr = std::make_shared<Composite>(composite);
 					all_shapes.insert(std::make_pair(name, composite_ptr));
 					open_shapes.insert(std::make_pair(name, composite_ptr));
+					
 				}
 
 			}
@@ -287,6 +286,7 @@ Scene parse_sdf(std::string const& sdf_path) {
 
 	for (auto [name, ptr] : open_shapes) {
 		scene.root->add_shape(ptr);
+		std::cout << name;
 		//open_shapes.erase(name);
 	}
 
