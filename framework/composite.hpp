@@ -26,7 +26,7 @@ public:
 
 private:
 	std::string name_ = "";
-	std::vector<std::shared_ptr<Shape>> container;
+	std::vector<std::shared_ptr<Shape>> children_;
 };
 
 #endif
