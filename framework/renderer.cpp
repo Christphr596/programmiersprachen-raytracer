@@ -42,7 +42,7 @@ void Renderer::rapid_prototyping() {
 }*/
 
 
-Color Renderer::shade(Ray const& ray, std::shared_ptr<Shape> const& s, HitPoint const& h) {
+Color Renderer::shade(Ray const& ray, /*std::shared_ptr<Shape> const& s,*/ HitPoint const& h) {
 
     glm::vec3 normale = h.normale;/*glm::normalize(s->normale(h.point))*/;
     glm::vec3 point = h.point + 0.1f * normale;
@@ -99,7 +99,7 @@ Color Renderer::shade(Ray const& ray, std::shared_ptr<Shape> const& s, HitPoint 
 }
 
 Color Renderer::trace(Ray const& r) {
-
+    /*
     HitPoint closest_hp{};
     std::shared_ptr<Shape> closest_s{};
 
@@ -108,15 +108,17 @@ Color Renderer::trace(Ray const& r) {
         HitPoint hp = s->intersect(r);
         if (hp.cut) {
             if (hp.distance < closest_hp.distance) {
-                closest_hp = /*transform(s->get_w_t_mat(), hp)*/hp;
+                closest_hp = /*transform(s->get_w_t_mat(), hp)*//*hp;
                 closest_s = s;
             }
         }
         
-    }
+    }*/
 
-    if (closest_hp.cut) {
-        return shade(r, closest_s, closest_hp);
+    HitPoint hp = scene_.root->intersect(r);
+
+    if (hp.cut) {
+        return shade(r/*, closest_s*/, hp);
     }
     else {
         return Color{ 0.5f, 0.5f, 0.5f };
