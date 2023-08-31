@@ -5,6 +5,7 @@
 #include <sstream>
 #include <array>
 #include <vector>
+#include <utility>
 #include "composite.hpp"
 #include "shape.hpp"
 
@@ -14,6 +15,7 @@
 Scene parse_sdf(std::string const& sdf_path) {
 	
 	std::map<std::string, std::shared_ptr<Shape>> open_shapes;
+	std::map<std::string, std::shared_ptr<Shape>> all_shapes;
 	int size = open_shapes.size();
 
 	Scene scene{};
@@ -100,7 +102,10 @@ Scene parse_sdf(std::string const& sdf_path) {
 					std::shared_ptr<Material> mat = scene.material_container[name_mat];
 
 					Box box{ name, glm::vec3{vec1[0], vec1[1], vec1[2]},  glm::vec3{vec2[0], vec2[1], vec2[2]}, mat };
-					scene.shape_container.push_back(std::make_shared<Box>(box));
+					auto box_ptr = std::make_shared<Box>(box);
+					//scene.shape_container.push_back(box_ptr);
+					all_shapes.insert(std::make_pair(name, box_ptr));
+					open_shapes.insert(std::make_pair(name, box_ptr));
 
 				}
 				if (token == "sphere") {
@@ -124,7 +129,10 @@ Scene parse_sdf(std::string const& sdf_path) {
 					std::shared_ptr<Material> mat = scene.material_container[name_mat];
 
 					Sphere sphere{ name,  glm::vec3{vec[0], vec[1], vec[2]}, radius, mat };
-					scene.shape_container.push_back(std::make_shared<Sphere>(sphere));
+					auto sphere_ptr = std::make_shared<Sphere>(sphere);
+					//scene.shape_container.push_back(sphere_ptr);
+					all_shapes.insert(std::make_pair(name, sphere_ptr));
+					open_shapes.insert(std::make_pair(name, sphere_ptr));
 				}
 				
 				if (token == "composite") {
@@ -137,14 +145,21 @@ Scene parse_sdf(std::string const& sdf_path) {
 					std::istringstream line;
 					std::string new_word;
 					while (line >> new_word) {
+						/*
 						for (auto const& i : scene.all_shapes) {
 							if (i->get_name() == new_word) {
 								composite.add_shape(i);
 								//scene.all_shapes.erase(i);
 							}
-						}
-					}
+						}*/
 
+						//auto it = open_shapes.find(new_word);
+						composite.add_shape(open_shapes.at(new_word));
+						open_shapes.erase(new_word);
+					}
+					auto composite_ptr = std::make_shared<Composite>(composite);
+					all_shapes.insert(std::make_pair(name, composite_ptr));
+					open_shapes.insert(std::make_pair(name, composite_ptr));
 				}
 
 			}
@@ -213,8 +228,8 @@ Scene parse_sdf(std::string const& sdf_path) {
 				std::string name;
 				string_stream >> name;
 
-				for (auto it : scene.shape_container) {
-					if (it->get_name() == name) {
+				//for (auto it : scene.shape_container) {
+					//if (it->get_name() == name) {
 						string_stream >> token;
 
 
@@ -225,7 +240,8 @@ Scene parse_sdf(std::string const& sdf_path) {
 								string_stream >> value;
 								scale[i] = value;
 							}
-							it->scale(glm::vec3{ scale[0], scale[1], scale[2] });
+							//it->scale(glm::vec3{ scale[0], scale[1], scale[2] });
+							all_shapes.at(name)->scale(glm::vec3{scale[0], scale[1], scale[2]});
 						}
 
 
@@ -237,7 +253,8 @@ Scene parse_sdf(std::string const& sdf_path) {
 								trans[i] = value;
 							}
 
-							it->translate(glm::vec3{ trans[0], trans[1], trans[2] });
+							//it->translate(glm::vec3{ trans[0], trans[1], trans[2] });
+							all_shapes.at(name)->translate(glm::vec3{trans[0], trans[1], trans[2]});
 						}
 
 
@@ -252,13 +269,15 @@ Scene parse_sdf(std::string const& sdf_path) {
 								rot[i] = value;
 							}
 
-							it->rotate(degree, glm::vec3{ rot[0], rot[1], rot[2] });
+							//it->rotate(degree, glm::vec3{ rot[0], rot[1], rot[2] });
+							all_shapes.at(name)->rotate(degree, glm::vec3{rot[0], rot[1], rot[2]});
 
 						}
 
-						it->update_w_t_mat();
-					}
-				}
+						//it->update_w_t_mat();
+						all_shapes.at(name)->update_w_t_mat();
+					//}
+				//}
 
 			}
 
@@ -266,9 +285,9 @@ Scene parse_sdf(std::string const& sdf_path) {
 
 	}
 
-	for (auto it : open_shapes) {
-		scene.ptr_->add_shape(it.second);
-		open_shapes.erase(it.first);
+	for (auto [name, ptr] : open_shapes) {
+		scene.root->add_shape(ptr);
+		//open_shapes.erase(name);
 	}
 
 	return scene;

@@ -14,12 +14,12 @@
 struct Scene {
 
 	std::map<std::string, std::shared_ptr<Material>> material_container{};
-	std::shared_ptr<Composite> ptr_ = std::make_shared<Composite>(Composite{ "composite_" });
-	std::vector<std::shared_ptr<Shape>> shape_container;
+	std::shared_ptr<Composite> root = std::make_shared<Composite>(Composite{ "composite_" });
+	//std::vector<std::shared_ptr<Shape>> shape_container;
 	std::vector<std::shared_ptr<Camera>> camera_container;
 	std::vector<std::shared_ptr<Light>> light_container;
 
-	std::vector<std::shared_ptr<Shape>> all_shapes;
+	//std::vector<std::shared_ptr<Shape>> all_shapes;
 
 };
 
