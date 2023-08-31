@@ -62,15 +62,15 @@ Color Renderer::shade(Ray const& ray, /*std::shared_ptr<Shape> const& s,*/ HitPo
         glm::vec3 light_vec = glm::normalize((l->position) - h.point);
 
         bool visible = true;
-        for (auto i : scene_.shape_container) {
-                HitPoint barrier = i->intersect(Ray{ point, light_vec });
+        //for (auto i : scene_.shape_container) {
+                HitPoint barrier = scene_.root->intersect(Ray{ point, light_vec });
 
                 if (barrier.cut && barrier.distance < glm::distance(l->position, h.point) && barrier.distance > 0) {
                     visible = false;
-                    break;
+                    //break;
                 }
             
-        }
+        //}
 
         if (visible) {
             spotlights_vec.insert(std::make_pair(l, light_vec));
@@ -114,6 +114,7 @@ Color Renderer::trace(Ray const& r) {
         }
         
     }*/
+
 
     HitPoint hp = scene_.root->intersect(r);
 
