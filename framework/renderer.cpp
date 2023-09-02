@@ -77,6 +77,7 @@ Color Renderer::shade(Ray const& ray, /*std::shared_ptr<Shape> const& s,*/ HitPo
         }
     }
 
+    
     for (auto [l, l_vec] : spotlights_vec) {
         float skalar_n_l_vec = std::max( glm::dot(normale, l_vec), 0.0f);
 
@@ -93,6 +94,19 @@ Color Renderer::shade(Ray const& ray, /*std::shared_ptr<Shape> const& s,*/ HitPo
     //red = (normale.x + 1.0f) / 2.0f;
     //green = (normale.y + 1.0f) / 2.0f;
     //blue = (normale.z + 1.0f) / 2.0f;
+
+    /*
+    if (h.distance < 1000) {
+        red = 1;
+        green = 0;
+        blue = 0;
+    }
+    else {
+        red = 0;
+        green = 1;
+        blue = 0;
+    }*/
+
 
     return Color{red, green, blue};
 
@@ -119,7 +133,7 @@ Color Renderer::trace(Ray const& r) {
     HitPoint hp = scene_.root->intersect(r);
 
     if (hp.cut) {
-        return shade(r/*, closest_s*/, hp);
+        return shade(r/*, closest_s*/,hp);
     }
     else {
         return Color{ 0.5f, 0.5f, 0.5f };
@@ -147,7 +161,7 @@ void Renderer::render() {
 
             glm::vec4 ray_direction{ glm::normalize(glm::vec3{(-(width_ / 2.0f) + float(x * 1.0f)), (-(height_ / 2.0f) + float(y * 1.0f)), -d}), 0 };
 
-            ray_direction = camera_mat * ray_direction;
+            ray_direction = glm::normalize(camera_mat * ray_direction);
 
             Ray r{ c->eye, glm::vec3{ray_direction.x, ray_direction.y, ray_direction.z} };
             Color c = trace(r);
