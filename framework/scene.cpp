@@ -212,7 +212,7 @@ Scene parse_sdf(std::string const& sdf_path) {
 				}
 
 				Camera camera{ name, fov_x, glm::vec3{eye[0], eye[1], eye[2]},  glm::vec3{dir[0], dir[1], dir[2]}, glm::vec3{up[0], up[1], up[2]} };
-				scene.camera_container.push_back(std::make_shared<Camera>(camera));
+				scene.camera = std::make_shared<Camera>(camera);
 			}
 
 			

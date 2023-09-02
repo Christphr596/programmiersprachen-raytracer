@@ -91,9 +91,9 @@ Color Renderer::trace(Ray const& r) {
 
 void Renderer::render() {
 
-    std::shared_ptr<Camera> c = scene_.camera_container.front();
+    std::shared_ptr<Camera> c = scene_.camera;
 
-    float d = (width_ / 2.0f) / std::tan((scene_.camera_container.front()->fov_x / 2) / 180 * OWN_PI);
+    float d = (width_ / 2.0f) / std::tan((c->fov_x / 2) / 180 * OWN_PI);
 
     glm::mat4 camera_mat{};
     camera_mat[0] = glm::vec4(glm::cross(c->dir, c->up), 0);
