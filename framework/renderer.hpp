@@ -28,8 +28,8 @@ public:
 
   void rapid_prototyping();
   void render();
-  Color trace(Ray const& r);
-  Color shade(Ray const& r, HitPoint const& h);
+  Color trace(Ray const& r) const;
+  Color shade(Ray const& r, HitPoint const& h) const;
   void write(Pixel const& p);
 
   inline std::vector<Color> const& color_buffer() const

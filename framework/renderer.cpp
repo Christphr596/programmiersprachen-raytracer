@@ -27,7 +27,7 @@ Renderer::Renderer(unsigned w, unsigned h, std::string const& file, Scene const&
   , scene_(scene)
 {}
 
-Color Renderer::shade(Ray const& ray,  HitPoint const& h) {
+Color Renderer::shade(Ray const& ray,  HitPoint const& h) const {
 
     glm::vec3 normale = h.normale;
     glm::vec3 point = h.point + 0.1f * normale;
@@ -67,7 +67,7 @@ Color Renderer::shade(Ray const& ray,  HitPoint const& h) {
 
 }
 
-Color Renderer::trace(Ray const& r) {
+Color Renderer::trace(Ray const& r) const{
     
     HitPoint hp = scene_.root->intersect(r);
 
