@@ -28,15 +28,26 @@ HitPoint Sphere::intersect(Ray const& r_original) {
 	Ray r = transform(Shape::get_w_t_inv_mat(), r_original);
 
 	float distance = 0.0f;
-	//glm::normalize(r.direction);
+
+	
+	//glm::vec3 r_direction_transformed = glm::normalize(r.direction);
+	r.direction = glm::normalize(r.direction);
+
 	bool cut = glm::intersectRaySphere(r.origin, r.direction, center_, radius_ * radius_, distance);
 	//std::pair<std::string, std::shared_ptr<Material>> n_c = Shape::get_n_c();
 
 	HitPoint hitpoint{ cut, distance,Shape::get_name() /*n_c.first*/, Shape::get_material()/* n_c.second*/, r.origin + distance * r.direction, r.direction, normale(r.origin + distance * r.direction)};
 
 	hitpoint = transform(Shape::get_w_t_mat(), hitpoint);
-	return hitpoint;
+
+	
+	glm::vec3 dis = hitpoint.point - r_original.origin;
+	float dist = glm::distance(hitpoint.point, r_original.origin);
+	HitPoint hp {hitpoint.cut, dist, hitpoint.name, hitpoint.material, hitpoint.point, hitpoint.direction, hitpoint.normale};
+
+	return hp;
 }
+
 
 std::ostream& Sphere::print(std::ostream& os)const{
 	Shape::print(os);
