@@ -35,7 +35,6 @@ HitPoint Composite::intersect(Ray const& r_original) {
         if (hp.cut) {
             if (hp.distance < closest_hp.distance) {
                 closest_hp = hp;
-                //closest_s = s;
             }
         }
 
