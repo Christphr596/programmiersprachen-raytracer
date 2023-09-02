@@ -40,9 +40,6 @@ Color Renderer::shade(Ray const& ray,  HitPoint const& h) {
     green += h.material->ka.g * 0.5f;
     blue += h.material->ka.b * 0.5f;
 
-    std::map<std::shared_ptr<Light>, glm::vec3> spotlights_vec{};
-
-    
     for (auto l : scene_.light_container) {
         glm::vec3 light_vec = glm::normalize((l->position) - h.point);
 
@@ -54,23 +51,18 @@ Color Renderer::shade(Ray const& ray,  HitPoint const& h) {
         }
 
         if (visible) {
-            spotlights_vec.insert(std::make_pair(l, light_vec));
-        }
-    }
+            float skalar_n_l_vec = std::max(glm::dot(normale, light_vec), 0.0f);
 
-    
-    for (auto [l, l_vec] : spotlights_vec) {
-        float skalar_n_l_vec = std::max( glm::dot(normale, l_vec), 0.0f);
+            glm::vec3 r = glm::normalize(2 * skalar_n_l_vec * normale - light_vec);
+            glm::vec3 v = glm::normalize(ray.origin - h.point);
+            float skalar_r_v = std::max(glm::dot(r, v), 0.0f);
 
-        glm::vec3 r = glm::normalize(2 * skalar_n_l_vec * normale - l_vec);
-        glm::vec3 v = glm::normalize(ray.origin - h.point);
-        float skalar_r_v = std::max(glm::dot(r, v), 0.0f);
-
-        red += l->color.r * l->brightness * (h.material->kd.r * skalar_n_l_vec + h.material->ks.r * std::pow(skalar_r_v, h.material->m));
+            red += l->color.r * l->brightness * (h.material->kd.r * skalar_n_l_vec + h.material->ks.r * std::pow(skalar_r_v, h.material->m));
             green += l->color.g * l->brightness * (h.material->kd.g * skalar_n_l_vec + h.material->ks.g * std::pow(skalar_r_v, h.material->m));
             blue += l->color.b * l->brightness * (h.material->kd.b * skalar_n_l_vec + h.material->ks.b * std::pow(skalar_r_v, h.material->m));
+        }
     }
-
+    
     return Color{red, green, blue};
 
 }
