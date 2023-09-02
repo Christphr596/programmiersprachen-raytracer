@@ -27,24 +27,9 @@ Renderer::Renderer(unsigned w, unsigned h, std::string const& file, Scene const&
   , scene_(scene)
 {}
 
-/*
-void Renderer::rapid_prototyping() {
-    for (auto& s : scene_.camera_container) {
-        float distance = s->dis(width_, height_);
-        float haight = s->height(width_, height_);
-        for (unsigned int i = -(width_ % 2);i <= width_ / 2; i++) {
-            for (unsigned int j = -(height_ % 2); j <= height_ % 2; j++) {
-                Ray ray = s->ray_gen(j, distance, haight, width_);
-            }
-            Ray ray = s->ray_gen(i, distance, haight, width_);
-        }
-    }
-}*/
+Color Renderer::shade(Ray const& ray,  HitPoint const& h) const {
 
-
-Color Renderer::shade(Ray const& ray, /*std::shared_ptr<Shape> const& s,*/ HitPoint const& h) {
-
-    glm::vec3 normale = h.normale;/*glm::normalize(s->normale(h.point))*/;
+    glm::vec3 normale = h.normale;
     glm::vec3 point = h.point + 0.1f * normale;
 
     float red = 0.0f;
@@ -55,85 +40,39 @@ Color Renderer::shade(Ray const& ray, /*std::shared_ptr<Shape> const& s,*/ HitPo
     green += h.material->ka.g * 0.5f;
     blue += h.material->ka.b * 0.5f;
 
-    std::map<std::shared_ptr<Light>, glm::vec3> spotlights_vec{};
-
-    
     for (auto l : scene_.light_container) {
         glm::vec3 light_vec = glm::normalize((l->position) - h.point);
 
         bool visible = true;
-        //for (auto i : scene_.shape_container) {
-                HitPoint barrier = scene_.root->intersect(Ray{ point, light_vec });
+        HitPoint barrier = scene_.root->intersect(Ray{ point, light_vec });
 
-                if (barrier.cut && barrier.distance < glm::distance(l->position, h.point) && barrier.distance > 0) {
-                    visible = false;
-                    //break;
-                }
-            
-        //}
+        if (barrier.cut && barrier.distance < glm::distance(l->position, h.point) && barrier.distance > 0) {
+            visible = false;
+        }
 
         if (visible) {
-            spotlights_vec.insert(std::make_pair(l, light_vec));
-        }
-    }
+            float skalar_n_l_vec = std::max(glm::dot(normale, light_vec), 0.0f);
 
-    
-    for (auto [l, l_vec] : spotlights_vec) {
-        float skalar_n_l_vec = std::max( glm::dot(normale, l_vec), 0.0f);
+            glm::vec3 r = glm::normalize(2 * skalar_n_l_vec * normale - light_vec);
+            glm::vec3 v = glm::normalize(ray.origin - h.point);
+            float skalar_r_v = std::max(glm::dot(r, v), 0.0f);
 
-        glm::vec3 r = glm::normalize(2 * skalar_n_l_vec * normale - l_vec);
-        glm::vec3 v = glm::normalize(ray.origin - h.point);
-        float skalar_r_v = std::max(glm::dot(r, v), 0.0f);
-
-        red += l->color.r * l->brightness * (h.material->kd.r * skalar_n_l_vec + h.material->ks.r * std::pow(skalar_r_v, h.material->m));
+            red += l->color.r * l->brightness * (h.material->kd.r * skalar_n_l_vec + h.material->ks.r * std::pow(skalar_r_v, h.material->m));
             green += l->color.g * l->brightness * (h.material->kd.g * skalar_n_l_vec + h.material->ks.g * std::pow(skalar_r_v, h.material->m));
             blue += l->color.b * l->brightness * (h.material->kd.b * skalar_n_l_vec + h.material->ks.b * std::pow(skalar_r_v, h.material->m));
+        }
     }
-
-    // visualisation of normals
-    //red = (normale.x + 1.0f) / 2.0f;
-    //green = (normale.y + 1.0f) / 2.0f;
-    //blue = (normale.z + 1.0f) / 2.0f;
-
-    /*
-    if (h.distance < 1000) {
-        red = 1;
-        green = 0;
-        blue = 0;
-    }
-    else {
-        red = 0;
-        green = 1;
-        blue = 0;
-    }*/
-
-
+    
     return Color{red, green, blue};
 
 }
 
-Color Renderer::trace(Ray const& r) {
-    /*
-    HitPoint closest_hp{};
-    std::shared_ptr<Shape> closest_s{};
-
-    for (auto s : scene_.shape_container) {
-        //Ray r_transformed =transform(s->get_w_t_inv_mat(), r);
-        HitPoint hp = s->intersect(r);
-        if (hp.cut) {
-            if (hp.distance < closest_hp.distance) {
-                closest_hp = /*transform(s->get_w_t_mat(), hp)*//*hp;
-                closest_s = s;
-            }
-        }
-        
-    }*/
-
-
+Color Renderer::trace(Ray const& r) const{
+    
     HitPoint hp = scene_.root->intersect(r);
 
     if (hp.cut) {
-        return shade(r/*, closest_s*/,hp);
+        return shade(r,hp);
     }
     else {
         return Color{ 0.5f, 0.5f, 0.5f };
@@ -144,9 +83,9 @@ Color Renderer::trace(Ray const& r) {
 
 void Renderer::render() {
 
-    std::shared_ptr<Camera> c = scene_.camera_container.front();
+    std::shared_ptr<Camera> c = scene_.camera;
 
-    float d = (width_ / 2.0f) / std::tan((scene_.camera_container.front()->fov_x / 2) / 180 * OWN_PI);
+    float d = (width_ / 2.0f) / std::tan((c->fov_x / 2) / 180 * OWN_PI);
 
     glm::mat4 camera_mat{};
     camera_mat[0] = glm::vec4(glm::cross(c->dir, c->up), 0);
@@ -174,24 +113,6 @@ void Renderer::render() {
 
 }
 
-/*void Renderer::render()
-{
-  std::size_t const checker_pattern_size = 20;
-
-  for (unsigned y = 0; y < height_; ++y) {
-    for (unsigned x = 0; x < width_; ++x) {
-      Pixel p(x,y);
-      if ( ((x/checker_pattern_size)%2) != ((y/checker_pattern_size)%2)) {
-        p.color = Color{0.0f, 1.0f, float(x)/height_};
-      } else {
-        p.color = Color{1.0f, 0.0f, float(y)/width_};
-      }
-
-      write(p);
-    }
-  }
-  ppm_.save(filename_);
-}*/
 
 void Renderer::write(Pixel const& p)
 {

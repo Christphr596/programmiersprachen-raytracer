@@ -41,7 +41,6 @@ Scene parse_sdf(std::string const& sdf_path) {
 			if (token == "material") {
 				std::string name;
 				string_stream >> name;
-				//std::cout << name;
 
 				float value = 0.0f;
 
@@ -49,7 +48,6 @@ Scene parse_sdf(std::string const& sdf_path) {
 				for (int i = 0; i < ka.size(); ++i) {
 					string_stream >> value;
 					ka[i] = value;
-					//std::cout << ka[i];
 				}
 
 				std::array<float, 3> kd{};
@@ -103,7 +101,7 @@ Scene parse_sdf(std::string const& sdf_path) {
 
 					Box box{ name, glm::vec3{vec1[0], vec1[1], vec1[2]},  glm::vec3{vec2[0], vec2[1], vec2[2]}, mat };
 					auto box_ptr = std::make_shared<Box>(box);
-					//scene.shape_container.push_back(box_ptr);
+
 					all_shapes.insert(std::make_pair(name, box_ptr));
 					open_shapes.insert(std::make_pair(name, box_ptr));
 
@@ -130,7 +128,7 @@ Scene parse_sdf(std::string const& sdf_path) {
 
 					Sphere sphere{ name,  glm::vec3{vec[0], vec[1], vec[2]}, radius, mat };
 					auto sphere_ptr = std::make_shared<Sphere>(sphere);
-					//scene.shape_container.push_back(sphere_ptr);
+
 					all_shapes.insert(std::make_pair(name, sphere_ptr));
 					open_shapes.insert(std::make_pair(name, sphere_ptr));
 				}
@@ -142,7 +140,6 @@ Scene parse_sdf(std::string const& sdf_path) {
 
 					Composite composite{ name };
 
-					//std::istringstream line;
 					std::string new_word{};
 					
 					while (!string_stream.eof()) {
@@ -152,10 +149,9 @@ Scene parse_sdf(std::string const& sdf_path) {
 						open_shapes.erase(new_word);
 
 					}
-
-					//line_buffer.append( " define");
 						
 					auto composite_ptr = std::make_shared<Composite>(composite);
+
 					all_shapes.insert(std::make_pair(name, composite_ptr));
 					open_shapes.insert(std::make_pair(name, composite_ptr));
 					
@@ -216,7 +212,7 @@ Scene parse_sdf(std::string const& sdf_path) {
 				}
 
 				Camera camera{ name, fov_x, glm::vec3{eye[0], eye[1], eye[2]},  glm::vec3{dir[0], dir[1], dir[2]}, glm::vec3{up[0], up[1], up[2]} };
-				scene.camera_container.push_back(std::make_shared<Camera>(camera));
+				scene.camera = std::make_shared<Camera>(camera);
 			}
 
 			
@@ -227,67 +223,50 @@ Scene parse_sdf(std::string const& sdf_path) {
 				std::string name;
 				string_stream >> name;
 
-				//for (auto it : scene.shape_container) {
-					//if (it->get_name() == name) {
-						string_stream >> token;
+				string_stream >> token;
 
+				if (token == "scale") {
 
-						if (token == "scale") {
+					std::array<float, 3> scale{};
+					for (int i = 0; i < scale.size(); ++i) {
+						string_stream >> value;
+						scale[i] = value;
+					}
+					all_shapes.at(name)->scale(glm::vec3{scale[0], scale[1], scale[2]});
+				}
 
-							std::array<float, 3> scale{};
-							for (int i = 0; i < scale.size(); ++i) {
-								string_stream >> value;
-								scale[i] = value;
-							}
-							//it->scale(glm::vec3{ scale[0], scale[1], scale[2] });
-							all_shapes.at(name)->scale(glm::vec3{scale[0], scale[1], scale[2]});
-						}
+				if (token == "translate") {
 
+					std::array<float, 3> trans{};
+					for (int i = 0; i < trans.size(); ++i) {
+						string_stream >> value;
+						trans[i] = value;
+					}
+					all_shapes.at(name)->translate(glm::vec3{trans[0], trans[1], trans[2]});
+				}
 
-						if (token == "translate") {
+				if (token == "rotate") {
 
-							std::array<float, 3> trans{};
-							for (int i = 0; i < trans.size(); ++i) {
-								string_stream >> value;
-								trans[i] = value;
-							}
+					float degree = 0.0f;
+					string_stream >> degree;
 
-							//it->translate(glm::vec3{ trans[0], trans[1], trans[2] });
-							all_shapes.at(name)->translate(glm::vec3{trans[0], trans[1], trans[2]});
-						}
+					std::array<float, 3> rot{};
+					for (int i = 0; i < rot.size(); ++i) {
+						string_stream >> value;
+						rot[i] = value;
+					}
+					all_shapes.at(name)->rotate(degree, glm::vec3{rot[0], rot[1], rot[2]});
+				}
 
-
-						if (token == "rotate") {
-
-							float degree = 0.0f;
-							string_stream >> degree;
-
-							std::array<float, 3> rot{};
-							for (int i = 0; i < rot.size(); ++i) {
-								string_stream >> value;
-								rot[i] = value;
-							}
-
-							//it->rotate(degree, glm::vec3{ rot[0], rot[1], rot[2] });
-							all_shapes.at(name)->rotate(degree, glm::vec3{rot[0], rot[1], rot[2]});
-
-						}
-
-						//it->update_w_t_mat();
-						all_shapes.at(name)->update_w_t_mat();
-					//}
-				//}
+				all_shapes.at(name)->update_w_t_mat();
 
 			}
-
 		}
-
 	}
 
 	for (auto [name, ptr] : open_shapes) {
 		scene.root->add_shape(ptr);
 		std::cout << name;
-		//open_shapes.erase(name);
 	}
 
 	return scene;
