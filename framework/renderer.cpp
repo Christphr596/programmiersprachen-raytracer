@@ -27,30 +27,34 @@ Renderer::Renderer(unsigned w, unsigned h, std::string const& file, Scene const&
   , scene_(scene)
 {}
 
-Color Renderer::shade(Ray const& ray,  HitPoint const& h) const {
+Color Renderer::shade(Ray const& ray,  HitPoint const& h) const { //Berechnet die Farbe die ein Material an einem Punkt hat
 
     glm::vec3 normale = h.normale;
-    glm::vec3 point = h.point + 0.1f * normale;
+    glm::vec3 point = h.point + 0.1f * normale; // Schiebt Schnittpunkt etwas von der Oberfläche des Objektes weg, um Shadow Acne zu vermeiden
 
     float red = 0.0f;
     float green = 0.0f;
     float blue = 0.0f;
 
+    //ambiente Beleuchtung
     red += h.material->ka.r * 0.5f;
     green += h.material->ka.g * 0.5f;
     blue += h.material->ka.b * 0.5f;
 
+    //diffuse und spekulare Beleuchtung
     for (auto l : scene_.light_container) {
-        glm::vec3 light_vec = glm::normalize((l->position) - h.point);
+        glm::vec3 light_vec = glm::normalize((l->position) - h.point); //Vektor der vom Hitpoint zur Lichtquelle geht
 
-        bool visible = true;
+        //Prüfung ob ein anderes Objekt zwischen dem Hitpoint und der Lichtquelle liegt
+        bool visible = true; //Lichtquelle ist vom Hitpoint aus sichtbar
         HitPoint barrier = scene_.root->intersect(Ray{ point, light_vec });
 
-        if (barrier.cut && barrier.distance < glm::distance(l->position, h.point) && barrier.distance > 0) {
+        if (barrier.cut && barrier.distance < glm::distance(l->position, h.point) && barrier.distance > 0) { //Prüfung ob es eine Intersection gibt und ob diese im Bereich zwischen Hitpoint und Lichtquelle liegt (oder eben davor oder dahinter)
             visible = false;
         }
 
         if (visible) {
+            //Berechnung der diffusen und spekularen Werte
             float skalar_n_l_vec = std::max(glm::dot(normale, light_vec), 0.0f);
 
             glm::vec3 r = glm::normalize(2 * skalar_n_l_vec * normale - light_vec);
@@ -67,26 +71,27 @@ Color Renderer::shade(Ray const& ray,  HitPoint const& h) const {
 
 }
 
-Color Renderer::trace(Ray const& r) const{
+Color Renderer::trace(Ray const& r) const{ //Berechnet welches Material(bzw kein Material) mit dem Strahl eines Pixels getroffen wird
     
-    HitPoint hp = scene_.root->intersect(r);
+    HitPoint hp = scene_.root->intersect(r);//Welches Objekt (Material) wird mit dem übergebenen Strahl getroffen
 
-    if (hp.cut) {
+    if (hp.cut) { //Wenn ein Objekt getroffen wird, wird die Farbe des Materials an der Stelle berechnet und zurückgegeben
         return shade(r,hp);
     }
-    else {
+    else {//Wenn kein Objekt getroffen wurde, wird die Hintergrundfarbe zurückgegeben
         return Color{ 0.5f, 0.5f, 0.5f };
     }
 
     
 }
 
-void Renderer::render() {
+void Renderer::render() { //Schießt Strahlen für jedes einzelne Pixel in die Scene und ordnet so jedem Pixel des Bildes eine Farbe zu
 
     std::shared_ptr<Camera> c = scene_.camera;
 
-    float d = (width_ / 2.0f) / std::tan((c->fov_x / 2) / 180 * OWN_PI);
+    float d = (width_ / 2.0f) / std::tan((c->fov_x / 2) / 180 * OWN_PI);//Entfernung des Kameraursprungs zur Bildfläche
 
+    //Berechnung der Kameratransformationsmatrix
     glm::mat4 camera_mat{};
     camera_mat[0] = glm::vec4(glm::cross(c->dir, c->up), 0);
     camera_mat[1] = glm::vec4(glm::cross(glm::cross(c->dir, c->up), c->dir), 0);
@@ -98,15 +103,15 @@ void Renderer::render() {
         for (unsigned x = 0; x < width_; ++x) {
             Pixel p{ x,y };
 
-            glm::vec4 ray_direction{ glm::normalize(glm::vec3{(-(width_ / 2.0f) + float(x * 1.0f)), (-(height_ / 2.0f) + float(y * 1.0f)), -d}), 0 };
+            glm::vec4 ray_direction{ glm::normalize(glm::vec3{(-(width_ / 2.0f) + float(x * 1.0f)), (-(height_ / 2.0f) + float(y * 1.0f)), -d}), 0 };// Berechnung der Strahlenrichtung
 
-            ray_direction = glm::normalize(camera_mat * ray_direction);
+            ray_direction = glm::normalize(camera_mat * ray_direction);//Transformation der Strahlenrichtung (Kameratransformation)
 
-            Ray r{ c->eye, glm::vec3{ray_direction.x, ray_direction.y, ray_direction.z} };
-            Color c = trace(r);
+            Ray r{ c->eye, glm::vec3{ray_direction.x, ray_direction.y, ray_direction.z} };//Erstellen des Strahls
+            Color c = trace(r);//Gibt die Farbe des Pixels zurück
             p.color = Color{ c.r / (c.r + 1), c.g / (c.g + 1), c.b / (c.b + 1) };
 
-            write(p);
+            write(p);//Pixel mit jetzt neuer Farbe wird in Color Buffer geschrieben
         }
     }
     ppm_.save(filename_);

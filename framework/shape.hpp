@@ -21,9 +21,11 @@ public:
 
 	virtual HitPoint intersect(Ray const& r) = 0;
 	virtual glm::vec3 normale(glm::vec3 const& point) = 0;
+	//Mathoden die die Einzelmatrizen verändern
 	void scale(glm::vec3 const& scale_vec);
 	void rotate(float degree, glm::vec3  const& rotation_axis);
 	void translate(glm::vec3 const& translation_vec);
+	//Methode, die die world_transformation Matrix (und ihre Inverse) richtig (dh. die drei Einzelmatrizen in der richtigen Reihenfolge) berechnen
 	void update_w_t_mat();
 	glm::mat4 get_w_t_mat() const;
 	glm::mat4 get_w_t_inv_mat() const;
